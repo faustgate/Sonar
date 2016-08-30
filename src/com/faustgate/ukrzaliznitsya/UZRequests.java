@@ -1,34 +1,48 @@
 package com.faustgate.ukrzaliznitsya;
 
 import android.os.AsyncTask;
+import okhttp3.FormBody;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.ProtocolException;
-import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 /**
  * Created by werwolf on 8/6/16.
  */
+
 public class UZRequests {
     private Map<String, String> headers = new HashMap<>();
-    private Map<String, Object> data = new HashMap<>();
-
-    private String requestType = "POST";
-
+    private Map<String, String> data = new HashMap<>();
     private Map<String, List<String>> lastHeaders;
-    boolean isAuthDataPresent = false;
+    private List<String> cookies = new ArrayList<>();
+
+    private boolean isAuthDataPresent = false;
     private boolean isRequestComplete = false;
-    String auth_token;
+    private String auth_token;
+    private String rem_head = "<script>var em = $v.rot13(GV.site.email_support);$$v('#contactEmail')." +
+            "attach({ href: 'mailto:' + em, innerHTML: em});" +
+            "$v.domReady(function () {Common.performModule();" +
+            "Common.pageInformation();" +
+            "Common.setOpacHover($$v('#footer .cards_ribbon a, #footer .left a')," +
+            " 50);Common.setOpacHover($$v('#footer .right a'), 70);});var _gaq =" +
+            " _gaq || [];_gaq.push(['_setAccount', 'UA-33134148-1']);_gaq.push" +
+            "(['_trackPageview']);";
+    private String rem_foot = "(function () {var ga = document.createElement('script');" +
+            "ga.async = true;" +
+            "ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + " +
+            "'.google-analytics.com/ga.js';" +
+            "var s = document.getElementsByTagName('script')[0];s.parentNode.insertBefore(ga, s);})();";
+
 
     public UZRequests() {
 //        debug = False
@@ -40,24 +54,75 @@ public class UZRequests {
         headers.put("User-Agent", "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 " +
                 "(KHTML, like Gecko) Chrome/52.0.2743.82 Safari/537.36");
 
-
-        data.put("another_ec", 0);
-        data.put("station_from", "0");
-        data.put("station_till", "0");
+        data.put("another_ec", "0");
         data.put("time_dep", "00:00");
         data.put("time_dep_till", "");
-
 
         JSONObject result;
 
     }
 
-    public String get_station_id(String station, String point) {
-        String first_letters = station.substring(0, 2).toLowerCase();
+    public List<HashMap<String, String>> getStationsInfo(String station_name) {
+        String first_letters = station_name.substring(0, 2).toLowerCase();
+        String res = "";
+        JSONObject dataJsonObj;
 
-        new GetUZData().execute("http://booking.uz.gov.ua/en/purchase/station/od");
+        List<HashMap<String, String>> stations = new ArrayList<>();
+        try {
+            res = new GetUZData().execute("http://booking.uz.gov.ua/en/purchase/station/" + first_letters).get();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
         // String response = performRequest(,  null);
-        return "sdf";
+        try {
+            dataJsonObj = new JSONObject(res);
+            JSONArray stt = dataJsonObj.getJSONArray("value");
+            for (int i = 0; i < stt.length(); i++) {
+                HashMap<String, String> station = new HashMap<>();
+                JSONObject sttt = stt.getJSONObject(i);
+                station.put("title", sttt.getString("title"));
+                station.put("station_id", sttt.getString("station_id"));
+                stations.add(station);
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return stations;
+    }
+
+    public void searchForTickets(String station_from_id, String station_to_id, String date) {
+        data.put("station_id_from", station_from_id);
+        data.put("station_id_till", station_to_id);
+        data.put("date_dep", date);
+
+        try {
+            Object res = new GetUZData().execute("http://booking.uz.gov.ua/purchase/search/").get();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private String getAuthToken(String page) {
+        String token = "";
+        String script = page.substring(page.lastIndexOf("<script>"), page.lastIndexOf("</script>"));
+        script = script.replace(rem_head, "").replace(rem_foot, "");
+        try {
+            token = new JJDecoder(script).decode().split("\"")[3];
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        headers.put("GV-Token", token);
+        headers.put("GV-Ajax", "1");
+        String str = "";
+        for (String el : cookies) {
+            str += el;
+        }
+        headers.put("Cookie", str);
+        return token;
     }
 
     private class GetUZData extends AsyncTask<String, Void, String> {
@@ -65,13 +130,10 @@ public class UZRequests {
         protected String doInBackground(String... urls) {
             if (!isAuthDataPresent) {
                 String page = performRequest("http://booking.uz.gov.ua/en");
-                UZGetAuthData uzgd = new UZGetAuthData();
-                String auth_token = uzgd.getAuthToken(page);
-                isAuthDataPresent=true;
+                auth_token = getAuthToken(page);
+                isAuthDataPresent = true;
             }
-            String response = performRequest(urls[0]);
-            return response;
-
+            return performRequest(urls[0]);
         }
 
         protected void onPostExecute(String response) {
@@ -84,63 +146,37 @@ public class UZRequests {
 
 
         private String performRequest(String url_adr) {
-            String resultJson = "";
+            String response_string = "";
             try {
-                URL url = new URL(url_adr);
-                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-                urlConnection.setConnectTimeout(500);
+                OkHttpClient client = new OkHttpClient();
 
-
-                urlConnection.setDoOutput(true);
-                urlConnection.setRequestMethod(requestType);
+//                RequestBody body = RequestBody.create(MediaType.parse("application/x-www-form-urlencoded"), data.toString());
+                FormBody.Builder body = new FormBody.Builder();
+                for (Map.Entry<String, String> entry : data.entrySet()) {
+                    String key = entry.getKey();
+                    String value = entry.getValue();
+                    body.add(key, value);
+                }
+                Request.Builder requestBuilder = new Request.Builder();
+                requestBuilder.url(url_adr);
+                requestBuilder.post(body.build());
                 for (Map.Entry<String, String> entry : headers.entrySet()) {
                     String key = entry.getKey();
                     String value = entry.getValue();
-                    urlConnection.setRequestProperty(key, value);
+                    requestBuilder.addHeader(key, value);
                     // do what you have to do here
                     // In your case, an other loop.
                 }
+                Request request = requestBuilder.build();
+                Response response = client.newCall(request).execute();
 
-                urlConnection.connect();
+                cookies = response.headers("Set-Cookie");
 
-                lastHeaders = urlConnection.getHeaderFields();
-
-                // Send POST output.
-                //OutputStream os = urlConnection.getOutputStream();
-//                os.write(json_data.getBytes());
-//                os.flush();
-
-                int responseCode = urlConnection.getResponseCode();
-
-                System.out.println("\nSending 'POST' request to URL : " + url);
-                System.out.println("Response Code : " + responseCode);
-
-
-                InputStream inputStream;
-                try {
-                    inputStream = urlConnection.getInputStream();
-                } catch (Exception e) {
-                    inputStream = urlConnection.getErrorStream();
-                }
-
-                StringBuffer buffer = new StringBuffer();
-                BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    buffer.append(line);
-                }
-                resultJson = buffer.toString();
-            } catch (ProtocolException e) {
-                e.printStackTrace();
-                return "null";
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-                return "null";
+                response_string = response.body().string();
             } catch (IOException e) {
                 e.printStackTrace();
-                return "null";
             }
-            return resultJson;
+            return response_string;
         }
 
 
