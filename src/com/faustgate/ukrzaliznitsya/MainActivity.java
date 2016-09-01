@@ -4,6 +4,9 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.*;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
@@ -42,14 +45,24 @@ public class MainActivity extends Activity {
         search.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if ((!stationFromId.equals("") && !stationToId.equals(""))) {
-                    String data = MessageFormat.format("{0} {1} {2} {3} {4}", stationFromName, stationFromId, stationToName,
-                            stationToId, getDateString());
-                    Toast.makeText(getApplicationContext(), data, Toast.LENGTH_LONG).show();
-                    UZRequests uzr = new UZRequests();
-                    uzr.searchForTickets(stationFromId, stationToId, getDateString());
-                    //List<HashMap<String, String>> stations = uzr.getStationsInfo(station_from);
+                //   if ((!stationFromId.equals("") && !stationToId.equals(""))) {
+                String data = MessageFormat.format("{0} {1} {2} {3} {4}", stationFromName, stationFromId, stationToName,
+                        stationToId, getDateString());
+                Toast.makeText(getApplicationContext(), data, Toast.LENGTH_LONG).show();
+                UZRequests uzr = new UZRequests();
+                JSONObject obj = uzr.searchForTickets(stationFromId, stationToId, getDateString());
+                try {
+                    JSONArray trains = obj.getJSONArray("value");
+                    TrainListAdapter trainAdapter = new TrainListAdapter(getApplicationContext(), trains);
+                    setContentView(R.layout.trains_select_layout);
+                    ListView lv = (ListView) findViewById(R.id.listView);
+                    lv.setAdapter(trainAdapter);
+                    String dsfg = "asdf";
+                } catch (JSONException e) {
+                    e.printStackTrace();
                 }
+                //List<HashMap<String, String>> stations = uzr.getStationsInfo(station_from);
+                //       }
             }
         });
 

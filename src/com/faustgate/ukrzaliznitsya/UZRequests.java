@@ -92,19 +92,25 @@ public class UZRequests {
         return stations;
     }
 
-    public void searchForTickets(String station_from_id, String station_to_id, String date) {
+    public JSONObject searchForTickets(String station_from_id, String station_to_id, String date) {
         data.put("station_id_from", station_from_id);
         data.put("station_id_till", station_to_id);
         data.put("date_dep", date);
-
         try {
-            Object res = new GetUZData().execute("http://booking.uz.gov.ua/purchase/search/").get();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
+            // Object res = new GetUZData().execute("http://booking.uz.gov.ua/purchase/search/").get();
+            // String str = StringEscapeUtils.unescapeJava(res.toString());
+            String test_data = "{\"value\":[{\"num\":\"136\\u0428\",\"model\":0,\"category\":0,\"travel_time\":\"12:10\",\"from\":{\"station_id\":2208001,\"station\":\"\\u041e\\u0434\\u0435\\u0441\\u0430-\\u0413\\u043e\\u043b\\u043e\\u0432\\u043d\\u0430\",\"date\":1474465020,\"src_date\":\"2016-09-21 16:37:00\"},\"till\":{\"station_id\":2218000,\"station\":\"\\u0427\\u0435\\u0440\\u043d\\u0456\\u0432\\u0446\\u0456\",\"date\":1474508820,\"src_date\":\"2016-09-22 04:47:00\"},\"types\":[{\"title\":\"\\u041b\\u044e\\u043a\\u0441\",\"letter\":\"\\u041b\",\"places\":8},{\"title\":\"\\u041a\\u0443\\u043f\\u0435\",\"letter\":\"\\u041a\",\"places\":6},{\"title\":\"\\u041f\\u043b\\u0430\\u0446\\u043a\\u0430\\u0440\\u0442\",\"letter\":\"\\u041f\",\"places\":54}]},{\"num\":\"108\\u0428\",\"model\":0,\"category\":0,\"travel_time\":\"12:18\",\"from\":{\"station_id\":2208001,\"station\":\"\\u041e\\u0434\\u0435\\u0441\\u0430-\\u0413\\u043e\\u043b\\u043e\\u0432\\u043d\\u0430\",\"date\":1474482360,\"src_date\":\"2016-09-21 21:26:00\"},\"till\":{\"station_id\":2218000,\"station\":\"\\u0423\\u0436\\u0433\\u043e\\u0440\\u043e\\u0434\",\"date\":1474526640,\"src_date\":\"2016-09-22 09:44:00\"},\"types\":[{\"title\":\"\\u041b\\u044e\\u043a\\u0441\",\"letter\":\"\\u041b\",\"places\":2},{\"title\":\"\\u041a\\u0443\\u043f\\u0435\",\"letter\":\"\\u041a\",\"places\":38},{\"title\":\"\\u041f\\u043b\\u0430\\u0446\\u043a\\u0430\\u0440\\u0442\",\"letter\":\"\\u041f\",\"places\":41}]}],\"error\":null,\"data\":null,\"captcha\":null}";
+            return new JSONObject(test_data);
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        } catch (ExecutionException e) {
+//            e.printStackTrace();
+        } catch (JSONException e) {
             e.printStackTrace();
         }
+        return null;
     }
+
 
     private String getAuthToken(String page) {
         String token = "";

@@ -36,14 +36,14 @@
                 android:layout_height="match_parent"
                 android:layout_width="match_parent"
                 android:text="Отпр.: "
-                android:gravity="center|right"
+                android:gravity="center|start"
                 android:layout_weight="1"
                 android:id="@+id/train_dep_date_header"/>
 
             <TextView
                 android:layout_weight="1"
                 android:layout_height="match_parent"
-                android:layout_width="match_parent"
+                android:layout_width="fill_parent"
                 android:text="13.13.2013"
                 android:gravity="center"
                 android:id="@+id/train_dep_date_field"/>
@@ -53,7 +53,7 @@
                 android:layout_height="match_parent"
                 android:layout_width="match_parent"
                 android:text="Приб."
-                android:gravity="center|right"
+                android:gravity="center|start"
                 android:id="@+id/train_arr_date_header"/>
 
             <TextView
