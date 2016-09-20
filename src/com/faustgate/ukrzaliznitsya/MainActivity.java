@@ -54,15 +54,21 @@ public class MainActivity extends Activity {
                 try {
                     JSONArray trains = obj.getJSONArray("value");
                     TrainListAdapter trainAdapter = new TrainListAdapter(getApplicationContext(), trains);
-                    setContentView(R.layout.trains_select_layout);
+                    setContentView(R.layout.select_trains_layout);
                     ListView lv = (ListView) findViewById(R.id.listView);
                     lv.setAdapter(trainAdapter);
+                    lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                        @Override
+                        public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
+                            String data = MessageFormat.format("{0} {1}", position, id);
+                            Toast.makeText(getApplicationContext(), data, Toast.LENGTH_LONG).show();
+                            setContentView(R.layout.select_place_layout);
+                        }
+                    });
                     String dsfg = "asdf";
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-                //List<HashMap<String, String>> stations = uzr.getStationsInfo(station_from);
-                //       }
             }
         });
 

@@ -52,7 +52,7 @@ public class StationAutoCompleteAdapter extends BaseAdapter implements Filterabl
     public View getView(int position, View convertView, ViewGroup parent) {
         if (convertView == null) {
             LayoutInflater inflater = LayoutInflater.from(mContext);
-            convertView = inflater.inflate(R.layout.station_name_item, parent, false);
+            convertView = inflater.inflate(R.layout.item_station, parent, false);
         }
         //String book = getItem(position);
         ((TextView) convertView.findViewById(R.id.text1)).setText(names.get(position));

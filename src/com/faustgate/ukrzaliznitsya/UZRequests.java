@@ -5,6 +5,7 @@ import okhttp3.FormBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import org.apache.commons.lang.StringEscapeUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -97,15 +98,12 @@ public class UZRequests {
         data.put("station_id_till", station_to_id);
         data.put("date_dep", date);
         try {
-            // Object res = new GetUZData().execute("http://booking.uz.gov.ua/purchase/search/").get();
-            // String str = StringEscapeUtils.unescapeJava(res.toString());
-            String test_data = "{\"value\":[{\"num\":\"136\\u0428\",\"model\":0,\"category\":0,\"travel_time\":\"12:10\",\"from\":{\"station_id\":2208001,\"station\":\"\\u041e\\u0434\\u0435\\u0441\\u0430-\\u0413\\u043e\\u043b\\u043e\\u0432\\u043d\\u0430\",\"date\":1474465020,\"src_date\":\"2016-09-21 16:37:00\"},\"till\":{\"station_id\":2218000,\"station\":\"\\u0427\\u0435\\u0440\\u043d\\u0456\\u0432\\u0446\\u0456\",\"date\":1474508820,\"src_date\":\"2016-09-22 04:47:00\"},\"types\":[{\"title\":\"\\u041b\\u044e\\u043a\\u0441\",\"letter\":\"\\u041b\",\"places\":8},{\"title\":\"\\u041a\\u0443\\u043f\\u0435\",\"letter\":\"\\u041a\",\"places\":6},{\"title\":\"\\u041f\\u043b\\u0430\\u0446\\u043a\\u0430\\u0440\\u0442\",\"letter\":\"\\u041f\",\"places\":54}]},{\"num\":\"108\\u0428\",\"model\":0,\"category\":0,\"travel_time\":\"12:18\",\"from\":{\"station_id\":2208001,\"station\":\"\\u041e\\u0434\\u0435\\u0441\\u0430-\\u0413\\u043e\\u043b\\u043e\\u0432\\u043d\\u0430\",\"date\":1474482360,\"src_date\":\"2016-09-21 21:26:00\"},\"till\":{\"station_id\":2218000,\"station\":\"\\u0423\\u0436\\u0433\\u043e\\u0440\\u043e\\u0434\",\"date\":1474526640,\"src_date\":\"2016-09-22 09:44:00\"},\"types\":[{\"title\":\"\\u041b\\u044e\\u043a\\u0441\",\"letter\":\"\\u041b\",\"places\":2},{\"title\":\"\\u041a\\u0443\\u043f\\u0435\",\"letter\":\"\\u041a\",\"places\":38},{\"title\":\"\\u041f\\u043b\\u0430\\u0446\\u043a\\u0430\\u0440\\u0442\",\"letter\":\"\\u041f\",\"places\":41}]}],\"error\":null,\"data\":null,\"captcha\":null}";
-            return new JSONObject(test_data);
-//        } catch (InterruptedException e) {
-//            e.printStackTrace();
-//        } catch (ExecutionException e) {
-//            e.printStackTrace();
-        } catch (JSONException e) {
+            Object res = new GetUZData().execute("http://booking.uz.gov.ua/purchase/search/").get();
+            String str = StringEscapeUtils.unescapeJava(res.toString());
+//            String test_data = "{\"value\":[{\"num\":\"136\\u0428\",\"model\":0,\"category\":0,\"travel_time\":\"12:10\",\"from\":{\"station_id\":2208001,\"station\":\"\\u041e\\u0434\\u0435\\u0441\\u0430-\\u0413\\u043e\\u043b\\u043e\\u0432\\u043d\\u0430\",\"date\":1474465020,\"src_date\":\"2016-09-21 16:37:00\"},\"till\":{\"station_id\":2218000,\"station\":\"\\u0427\\u0435\\u0440\\u043d\\u0456\\u0432\\u0446\\u0456\",\"date\":1474508820,\"src_date\":\"2016-09-22 04:47:00\"},\"types\":[{\"title\":\"\\u041b\\u044e\\u043a\\u0441\",\"letter\":\"\\u041b\",\"places\":8},{\"title\":\"\\u041a\\u0443\\u043f\\u0435\",\"letter\":\"\\u041a\",\"places\":6},{\"title\":\"\\u041f\\u043b\\u0430\\u0446\\u043a\\u0430\\u0440\\u0442\",\"letter\":\"\\u041f\",\"places\":54}]},{\"num\":\"108\\u0428\",\"model\":0,\"category\":0,\"travel_time\":\"12:18\",\"from\":{\"station_id\":2208001,\"station\":\"\\u041e\\u0434\\u0435\\u0441\\u0430-\\u0413\\u043e\\u043b\\u043e\\u0432\\u043d\\u0430\",\"date\":1474482360,\"src_date\":\"2016-09-21 21:26:00\"},\"till\":{\"station_id\":2218000,\"station\":\"\\u0423\\u0436\\u0433\\u043e\\u0440\\u043e\\u0434\",\"date\":1474526640,\"src_date\":\"2016-09-22 09:44:00\"},\"types\":[{\"title\":\"\\u041b\\u044e\\u043a\\u0441\",\"letter\":\"\\u041b\",\"places\":2},{\"title\":\"\\u041a\\u0443\\u043f\\u0435\",\"letter\":\"\\u041a\",\"places\":38},{\"title\":\"\\u041f\\u043b\\u0430\\u0446\\u043a\\u0430\\u0440\\u0442\",\"letter\":\"\\u041f\",\"places\":41}]}],\"error\":null,\"data\":null,\"captcha\":null}";
+//            return new JSONObject(test_data);
+            return new JSONObject(str);
+        } catch (InterruptedException | JSONException | ExecutionException e) {
             e.printStackTrace();
         }
         return null;
@@ -143,11 +141,11 @@ public class UZRequests {
         }
 
         protected void onPostExecute(String response) {
-            try {
-                JSONObject dataJsonObj = new JSONObject(response);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
+//            try {
+//                JSONObject dataJsonObj = new JSONObject(response);
+//            } catch (JSONException e) {
+//                e.printStackTrace();
+//            }
         }
 
 
@@ -155,8 +153,6 @@ public class UZRequests {
             String response_string = "";
             try {
                 OkHttpClient client = new OkHttpClient();
-
-//                RequestBody body = RequestBody.create(MediaType.parse("application/x-www-form-urlencoded"), data.toString());
                 FormBody.Builder body = new FormBody.Builder();
                 for (Map.Entry<String, String> entry : data.entrySet()) {
                     String key = entry.getKey();
@@ -170,8 +166,6 @@ public class UZRequests {
                     String key = entry.getKey();
                     String value = entry.getValue();
                     requestBuilder.addHeader(key, value);
-                    // do what you have to do here
-                    // In your case, an other loop.
                 }
                 Request request = requestBuilder.build();
                 Response response = client.newCall(request).execute();
@@ -184,136 +178,5 @@ public class UZRequests {
             }
             return response_string;
         }
-
-
     }
-
-
-//        aval_stations_data = json.loads(r '{0}'.format(response.text),
-//                'unicode-escape')
-//        for station in aval_stations_data['value']:
-//        cur.execute(
-//                'INSERT INTO stations_ru ('
-//        'name, '
-//        'station_id) VALUES (?,?)',
-//                (station['title'], station['station_id']))
-//        print('')
-//        con.commit()
-//        exit(0)
-//        if debug:
-//        print(aval_stations_data)
-//        if aval_stations_data['error'] or len (
-//                aval_stations_data['value']) == 0:
-//        print(
-//                "No suitable station found, please enter station name again or press Enter to exit")
-//        return _get_station_id('', point)
-//        aval_stations = aval_stations_data['value']
-//
-//        if len(aval_stations) > 1:
-//        print(
-//                "Oops, more than one station correspondent conditions you have entered, " \
-//                "please select needed from list bellow")
-//        count = 1
-//        for station in aval_stations:
-//        print(u '{0}. {1}'.format(count, station['title']))
-//        count += 1
-//        station_index = input("Please enter station index [1]:")
-//        if station_index == '':
-//        return aval_stations[0]['station_id']
-//            else:
-//        return aval_stations[int(station_index) - 1]['station_id']
-//            else:
-//        return aval_stations[0]['station_id']
-//    }
-//    def init_station_from(self, station_name=''):
-//            # data['station_from'] = station_name
-//    data['station_id_from'] = _get_station_id(station_name,
-//            '"from"')
-//
-//    def init_station_to(self, station_name=''):
-//            # data['station_till'] = station_name
-//    data['station_id_till'] = _get_station_id(station_name,
-//            '"to"')
-//
-//    def init_date(self):
-//    prompt = "Please enter data in DD.MM.YYYY format [{0}]: "
-//    date = input(prompt.format(dt.date.strftime(date, "%d.%m.%Y")))
-//            if date != '':
-//            try:
-//    date = dt.datetime.strptime(date, "%d.%m.%Y")
-//    except ValueError:
-//            if input("Wrong date, try again?") in ['Y', 'y']:
-//            init_date()
-//
-//    def _send_request(self, adress):
-//            if "coach" not in adress:
-//    data['date_dep'] = dt.date.strftime(date, "%d.%m.%Y")
-//    resp_enc = urllib.parse.urlencode(data)
-//    headers['Content-Length'] = len(resp_enc)
-//    headers['GV-Ajax'] = 1
-//    headers['GV-Token'] = token
-//
-//        if debug:
-//    print(resp_enc)
-//
-//    response = requests.post(adress, resp_enc, headers=headers)
-//            if debug:
-//    print(response.status_code, response.reason)
-//    data = json.loads(response.text)
-//            # print(u'{0}'.format(data["value"]["num"]))
-//            if debug:
-//    print(data)
-//
-//        if 'error' in data:
-//            if data['error']:
-//            if data['value'] == "По заданому Вами напрямку місць немає":
-//    print(
-//                        "{0} - {1}".format(dt.date.strftime(date,
-//                                                            "%d.%m.%Y"),
-//    data['value']))
-//            return -1
-//    print("An error occurred, see server message bellow")
-//    print(data['value'])
-//        if 'value' in data:
-//            return data['value']
-//            return data
-//
-//    def get_trains(self):
-//    search_address = 'http://booking.uz.gov.ua/purchase/search/'
-//    res = _send_request(search_address)
-//            if res == -1:
-//    uin = input('There is no places for selected date/direction, '
-//                        'would you like find nearest date with places [Y/n]: ')
-//            if uin not in ['', 'Y', 'y']:
-//    exit()
-//            while True:
-//    res = _send_request(search_address)
-//            if res == -1:
-//    date += dt.timedelta(1)
-//            time.sleep(1)
-//            else:
-//            break
-//            return res
-//
-//    def get_places(self, train, dep_time, coach_type):
-//    ret = {}
-//    data['date_dep'] = dep_time
-//    data['train'] = train
-//    data['coach_type'] = coach_type
-//            cars_response = _send_request(
-//            'http://booking.uz.gov.ua/ru/purchase/coaches/')
-//        for car in cars_response['coaches']:
-//    data['coach_type_id'] = cars_response['coach_type_id']
-//    data['coach_num'] = car['num']
-//    place_response = _send_request(
-//            'http://booking.uz.gov.ua/ru/purchase/coach/')
-//    ret[car['num']] = []
-//    places = []
-//            for key in place_response['places']:
-//            for place in place_response['places'][key]:
-//            places.append(int(place))
-//    ret[car['num']] += places
-//        return ret
-
-
 }

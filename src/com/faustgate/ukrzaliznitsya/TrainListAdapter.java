@@ -1,6 +1,7 @@
 package com.faustgate.ukrzaliznitsya;
 
 import android.content.Context;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,7 +13,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.text.MessageFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * Created by werwolf on 8/24/16.
@@ -56,13 +60,13 @@ public class TrainListAdapter extends BaseAdapter {
     public View getView(int position, View convertView, ViewGroup parent) {
         if (convertView == null) {
             LayoutInflater inflater = LayoutInflater.from(mContext);
-            convertView = inflater.inflate(R.layout.train_item, parent, false);
+            convertView = inflater.inflate(R.layout.item_train, parent, false);
         }
         JSONObject train = null;
         String number = "";
         String from_name = "";
         String to_name = "";
-        JSONArray places_types_obj = null;
+        JSONArray places_types_obj;
         List<HashMap<String, String>> places_types = new ArrayList<>();
         try {
             train = (JSONObject) mObjects.get(position);
@@ -84,25 +88,39 @@ public class TrainListAdapter extends BaseAdapter {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        String sdf = "asdf";
         if (train != null) {
             ((TextView) convertView.findViewById(R.id.train_num)).setText(number);
             ((TextView) convertView.findViewById(R.id.train_direction)).setText(MessageFormat.format("{0} - {1}", from_name, to_name));
-            int j = 1;
             LinearLayout mainLayout = (LinearLayout) convertView.findViewById(R.id.places_placeholder);
-            for (Map<String, String> place_type : places_types) {
-                LinearLayout placeLayout = (LinearLayout) convertView.findViewById(R.id.place_item);
-                ((TextView) placeLayout.findViewById(R.id.place_header)).setText(place_type.get("letter"));
-                ((TextView) placeLayout.findViewById(R.id.place_field)).setText(place_type.get("places"));
-                mainLayout.addView(placeLayout);
+            mainLayout.removeAllViews();
+            for (int idx = 0; idx < places_types.size(); idx++) {
+                LinearLayout linearLayout = new LinearLayout(mContext);
+                LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
+                        LinearLayout.LayoutParams.MATCH_PARENT, 1.0f);
+                linearLayout.setGravity(Gravity.CENTER);
+                linearLayout.setLayoutParams(lp);
+                TextView tv1 = new TextView(mContext);
+                tv1.setText(MessageFormat.format("{}:", places_types.get(idx).get("letter")));
+                TextView tv2 = new TextView(mContext);
+                tv2.setText(places_types.get(idx).get("places"));
+                if (places_types.size() == 2 && idx == 0) {
+                    tv1.setPadding(0, getPixelsFromDP(5), 0, 0);
+                    tv2.setPadding(0, getPixelsFromDP(5), 0, 0);
+                }
+                if (places_types.size() == 2 && idx == 1) {
+                    tv1.setPadding(0, 0, 0, getPixelsFromDP(5));
+                    tv2.setPadding(0, 0, 0, getPixelsFromDP(5));
+                }
+                linearLayout.addView(tv1);
+                linearLayout.addView(tv2);
+                mainLayout.addView(linearLayout);
             }
-            //        ((TextView) convertView.findViewById(R.id.text1)).setText(names.get(position));
-//        ((TextView) convertView.findViewById(R.id.text1)).setText(names.get(position));
-//        ((TextView) convertView.findViewById(R.id.text1)).setText(names.get(position));
-//        ((TextView) convertView.findViewById(R.id.text1)).setText(names.get(position));
-//        ((TextView) convertView.findViewById(R.id.text1)).setText(names.get(position));
-//        //((TextView) convertView.findViewById(R.id.text2)).setText(ids.get(position));
         }
         return convertView;
+    }
+
+    private int getPixelsFromDP(int sizeInDp) {
+        float scale = mContext.getResources().getDisplayMetrics().density;
+        return (int) (sizeInDp * scale + 0.5f);
     }
 }
