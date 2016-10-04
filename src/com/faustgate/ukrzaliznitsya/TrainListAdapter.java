@@ -98,7 +98,7 @@ public class TrainListAdapter extends BaseAdapter {
         }
         if (train != null) {
             ((TextView) convertView.findViewById(R.id.train_num)).setText(number);
-            ((TextView) convertView.findViewById(R.id.train_direction)).setText(MessageFormat.format("{0} ->ode {1}", from_name, to_name));
+            ((TextView) convertView.findViewById(R.id.train_direction)).setText(MessageFormat.format("{0} -> {1}", from_name, to_name));
             ((TextView) convertView.findViewById(R.id.train_dep_date_field)).setText(from_time);
             ((TextView) convertView.findViewById(R.id.train_arr_date_field)).setText(to_time);
 
