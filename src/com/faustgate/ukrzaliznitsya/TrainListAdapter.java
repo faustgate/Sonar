@@ -62,18 +62,26 @@ public class TrainListAdapter extends BaseAdapter {
             LayoutInflater inflater = LayoutInflater.from(mContext);
             convertView = inflater.inflate(R.layout.item_train, parent, false);
         }
-        JSONObject train = null;
+        JSONObject train = null, from_obj, to_obj;
         String number = "";
         String from_name = "";
+        String from_time = "";
         String to_name = "";
+        String to_time = "";
         JSONArray places_types_obj;
         List<HashMap<String, String>> places_types = new ArrayList<>();
         try {
             train = (JSONObject) mObjects.get(position);
+            from_obj = train.getJSONObject("from");
+            to_obj = train.getJSONObject("till");
+
             number = train.getString("num");
-            from_name = train.getJSONObject("from").getString("station");
-            to_name = train.getJSONObject("till").getString("station");
+            from_name = from_obj.getString("station");
+            from_time = from_obj.getString("src_date");
+            to_name = to_obj.getString("station");
+            to_time = to_obj.getString("src_date");
             places_types_obj = train.getJSONArray("types");
+
             if (places_types_obj != null) {
                 for (int i = 0; i < places_types_obj.length(); i++) {
                     HashMap<String, String> type = new HashMap<>();
@@ -90,7 +98,10 @@ public class TrainListAdapter extends BaseAdapter {
         }
         if (train != null) {
             ((TextView) convertView.findViewById(R.id.train_num)).setText(number);
-            ((TextView) convertView.findViewById(R.id.train_direction)).setText(MessageFormat.format("{0} - {1}", from_name, to_name));
+            ((TextView) convertView.findViewById(R.id.train_direction)).setText(MessageFormat.format("{0} ->ode {1}", from_name, to_name));
+            ((TextView) convertView.findViewById(R.id.train_dep_date_field)).setText(from_time);
+            ((TextView) convertView.findViewById(R.id.train_arr_date_field)).setText(to_time);
+
             LinearLayout mainLayout = (LinearLayout) convertView.findViewById(R.id.places_placeholder);
             mainLayout.removeAllViews();
             for (int idx = 0; idx < places_types.size(); idx++) {

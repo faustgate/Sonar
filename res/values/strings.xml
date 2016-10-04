@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">UKRZaliznitsya</string>
+    <string name="search">Search</string>
+    <string name="from">From</string>
+    <string name="to">To</string>
 </resources>

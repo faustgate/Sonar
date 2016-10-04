@@ -62,7 +62,7 @@ public class MainActivity extends Activity {
                         public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
                             String data = MessageFormat.format("{0} {1}", position, id);
                             Toast.makeText(getApplicationContext(), data, Toast.LENGTH_LONG).show();
-                            setContentView(R.layout.select_place_layout);
+                            //setContentView(R.layout.select_place_layout);
                         }
                     });
                     String dsfg = "asdf";

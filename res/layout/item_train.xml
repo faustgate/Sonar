@@ -3,7 +3,9 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:orientation="horizontal"
               android:layout_height="60dp"
-              android:layout_width="match_parent">
+              android:layout_width="match_parent"
+              android:paddingLeft="10dp"
+              android:paddingRight="10dp">
 
     <TextView
         android:text="113Ш"
@@ -48,7 +50,8 @@
                 android:layout_width="fill_parent"
                 android:text="13.13.2013"
                 android:gravity="center|start"
-                android:id="@+id/train_dep_date_field"/>
+                android:id="@+id/train_dep_date_field"
+                android:textSize="10dp"/>
 
             <TextView
                 android:layout_weight="1"
@@ -64,7 +67,8 @@
                 android:layout_width="match_parent"
                 android:text="11.11.2016"
                 android:id="@+id/train_arr_date_field"
-                android:gravity="center|start"/>
+                android:gravity="center|start"
+                android:textSize="10dp"/>
 
 
         </LinearLayout>
