@@ -1,12 +1,10 @@
 package com.faustgate.ukrzaliznitsya;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.*;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
@@ -50,25 +48,12 @@ public class MainActivity extends Activity {
                         stationToId, getDateString());
                 Toast.makeText(getApplicationContext(), data, Toast.LENGTH_LONG).show();
                 UZRequests uzr = new UZRequests();
-                JSONObject obj = uzr.searchForTickets(stationFromId, stationToId, getDateString());
-                try {
-                    JSONArray trains = obj.getJSONArray("value");
-                    TrainListAdapter trainAdapter = new TrainListAdapter(getApplicationContext(), trains);
-                    setContentView(R.layout.select_trains_layout);
-                    ListView lv = (ListView) findViewById(R.id.listView);
-                    lv.setAdapter(trainAdapter);
-                    lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                        @Override
-                        public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-                            String data = MessageFormat.format("{0} {1}", position, id);
-                            Toast.makeText(getApplicationContext(), data, Toast.LENGTH_LONG).show();
-                            //setContentView(R.layout.select_place_layout);
-                        }
-                    });
-                    String dsfg = "asdf";
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
+                String trainData = uzr.searchForTickets(stationFromId, stationToId, getDateString());
+
+                Intent intent = new Intent(MainActivity.this, TrainListActivity.class);
+                intent.putExtra("trains", trainData);
+                startActivity(intent);
+
             }
         });
 

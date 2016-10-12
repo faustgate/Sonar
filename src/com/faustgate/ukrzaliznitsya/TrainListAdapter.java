@@ -24,11 +24,8 @@ import java.util.List;
 
 public class TrainListAdapter extends BaseAdapter {
 
-    private static final int MAX_RESULTS = 10;
-
     private final Context mContext;
     private JSONArray mObjects;
-
 
     public TrainListAdapter(Context context, JSONArray values) {
         mContext = context;
