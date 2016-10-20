@@ -48,7 +48,7 @@ public class MainActivity extends Activity {
                         stationToId, getDateString());
                 Toast.makeText(getApplicationContext(), data, Toast.LENGTH_LONG).show();
                 UZRequests uzr = new UZRequests();
-                String trainData = uzr.searchForTickets(stationFromId, stationToId, getDateString());
+                String trainData = uzr.searchForTrains(stationFromId, stationToId, getDateString());
 
                 Intent intent = new Intent(MainActivity.this, TrainListActivity.class);
                 intent.putExtra("trains", trainData);
@@ -88,7 +88,7 @@ public class MainActivity extends Activity {
     }
 
     private String getDateString() {
-        SimpleDateFormat spf = new SimpleDateFormat("dd.MM.yyyy");
+        SimpleDateFormat spf = new SimpleDateFormat("MM.dd.yyyy");
         return spf.format(date.getTime());
     }
 }

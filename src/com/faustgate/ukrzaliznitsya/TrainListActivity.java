@@ -52,11 +52,9 @@ public class TrainListActivity extends Activity {
                     intent.putExtra("train", curTrain);
                     startActivity(intent);
 
-                    String sdf = "affas";
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-                //setContentView(R.layout.select_place_layout);
             }
         });
     }
