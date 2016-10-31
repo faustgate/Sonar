@@ -172,6 +172,7 @@ public class PlacesActivity extends Activity {
             buy_button.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    currentTicketDescription.put("ord", "0");
                     currentTicketDescription.put("firstname", "gsdfgs");
                     currentTicketDescription.put("lastname", "sdfgsfgs");
                     currentTicketDescription.put("bedding", "1");
