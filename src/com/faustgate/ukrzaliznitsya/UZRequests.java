@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URLEncoder;
 import java.text.MessageFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 
@@ -27,16 +28,19 @@ import java.util.concurrent.ExecutionException;
  * Created by werwolf on 8/6/16.
  */
 
-public class UZRequests {
+class UZRequests {
+    private static UZRequests mInstance = null;
     private Map<String, String> headers = new HashMap<>();
     private Map<String, String> formData = new HashMap<>();
     private Map<String, List<String>> lastHeaders;
     private Header[] cookies = new Header[]{};
-    private List<String> ticketFields = Arrays.asList("ord", "coach_num", "coach_class", "coach_type_id", "place_num", "firstname", "lastname", "bedding", "child", "stud", "transp", "reserve");
+    private List<String> ticketFields = Arrays.asList("ord", "charline", "wagon_num", "wagon_class", "wagon_type", "firstname", "lastname", "bedding", "child", "stud", "transportation", "reserve", "place_num");
+    private List<String> formFields = Arrays.asList("from", "to", "train", "date", "round_trip");
     private boolean isAuthDataPresent = false;
     private String auth_token;
     private ArrayList<HashMap<String, String>> ticketsDescriptions;
     private boolean isBuying = false;
+    private Date dateDep;
     private String rem_head = "<script>var em = $v.rot13(GV.site.email_support);$$v('#contactEmail')." +
             "attach({ href: 'mailto:' + em, innerHTML: em});" +
             "$v.domReady(function () {Common.performModule();" +
@@ -52,25 +56,30 @@ public class UZRequests {
             "var s = document.getElementsByTagName('script')[0];s.parentNode.insertBefore(ga, s);})();";
 
 
-    public UZRequests() {
+    UZRequests() {
         headers.put("Referer", "http://booking.uz.gov.ua");
         headers.put("User-Agent", "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 " +
                 "(KHTML, like Gecko) Chrome/52.0.2743.82 Safari/537.36");
     }
 
+    public static UZRequests getInstance() {
+        if (mInstance == null) {
+            mInstance = new UZRequests();
+        }
+        return mInstance;
+    }
+
     private void initFormData() {
         if (formData.size() > 0)
             formData.clear();
-        formData.put("another_ec", "0");
-        formData.put("time_dep", "00:00");
-        formData.put("time_dep_till", "");
     }
 
-
-    public List<HashMap<String, String>> getStationsInfo(String station_name) {
-        String first_letters = station_name.substring(0, 2).toLowerCase();
+    List<HashMap<String, String>> getStationsInfo(String station_name) {
+        String first_letters = station_name.toLowerCase();
         String res;
         JSONObject dataJsonObj;
+
+        initFormData();
 
         List<HashMap<String, String>> stations = new ArrayList<>();
         try {
@@ -90,11 +99,15 @@ public class UZRequests {
         return stations;
     }
 
-    public String searchForTrains(String station_from_id, String station_to_id, String date) {
+    String searchForTrains(String station_from_id, String station_to_id, Date date) {
         initFormData();
+        dateDep = date;
         formData.put("station_id_from", station_from_id);
         formData.put("station_id_till", station_to_id);
-        formData.put("date_dep", date);
+        formData.put("date_dep", new SimpleDateFormat("MM.dd.yyyy").format(dateDep.getTime()));
+        formData.put("time_dep", "00:00");
+        formData.put("time_dep_till", "");
+        formData.put("another_ec", "0");
         String result = null;
         try {
             Object res = new GetUZData().execute("http://booking.uz.gov.ua/en/purchase/search/").get();
@@ -105,7 +118,7 @@ public class UZRequests {
         return result;
     }
 
-    public List<JSONObject> searchForTickets(JSONObject trainInfo) {
+    List<JSONObject> searchForTickets(JSONObject trainInfo) {
 
         List<JSONObject> placesInfo = new ArrayList<>();
         Object res;
@@ -122,6 +135,7 @@ public class UZRequests {
             formData.put("station_id_till", toStationId);
             formData.put("date_dep", date);
             formData.put("train", trainId);
+            formData.put("another_ec", "0");
 
             for (int i = 0; i < car_types.length(); i++) {
                 if (formData.containsKey("coach_type"))
@@ -163,17 +177,16 @@ public class UZRequests {
         return placesInfo;
     }
 
-    public String buyTickets(JSONObject trainInfo, ArrayList<HashMap<String, String>> ticketDescriptions) {
+    String buyTickets(JSONObject trainInfo, ArrayList<HashMap<String, String>> ticketDescriptions) {
         String result = null;
         try {
             initFormData();
             String trainId = trainInfo.getString("num");
             String fromStationId = trainInfo.getJSONObject("from").getString("station_id");
             String toStationId = trainInfo.getJSONObject("till").getString("station_id");
-            String date = trainInfo.getJSONObject("from").getString("date");
-            formData.put("code_station_from", fromStationId);
-            formData.put("code_station_to", toStationId);
-            formData.put("date", date);
+            formData.put("from", fromStationId);
+            formData.put("to", toStationId);
+            formData.put("date", new SimpleDateFormat("yyyy-MM-dd").format(dateDep));
             formData.put("train", trainId);
             formData.put("round_trip", "0");
 
@@ -188,7 +201,7 @@ public class UZRequests {
         return "result";
     }
 
-    private String getAuthToken(String page) {
+    private String getAuthData(String page) {
         String token = "";
         String script = page.substring(page.lastIndexOf("<script>"), page.lastIndexOf("</script>"));
         script = script.replace(rem_head, "").replace(rem_foot, "");
@@ -209,12 +222,24 @@ public class UZRequests {
         return token;
     }
 
+    String getAuthToken() {
+        return headers.get("GV-Token");
+    }
+
+    String getAuthCookie() {
+        return headers.get("Cookie");
+    }
+
+    public void setDateDep(Date date_dep) {
+        dateDep = date_dep;
+    }
+
     private class GetUZData extends AsyncTask<String, Void, String> {
 
         protected String doInBackground(String... urls) {
             if (!isAuthDataPresent) {
                 String page = performRequest("http://booking.uz.gov.ua/en");
-                auth_token = getAuthToken(page);
+                auth_token = getAuthData(page);
                 isAuthDataPresent = true;
             }
             return performRequest(urls[0]);
@@ -247,14 +272,17 @@ public class UZRequests {
                 List<NameValuePair> pairs = new ArrayList<>();
                 String formDataStr = "";
                 if (isBuying) {
-                    for (Map.Entry<String, String> entry : formData.entrySet()) {
-                        String key = entry.getKey();
-                        String value = entry.getValue();
-                        if (formDataStr.length() > 0) {
-                            formDataStr += "&";
+
+                    for (String field : formFields) {
+                        if (formData.containsKey(field)) {
+                            String value = formData.get(field);
+                            if (formDataStr.length() > 0) {
+                                formDataStr += "&";
+                            }
+                            formDataStr += MessageFormat.format("{0}={1}", field, URLEncoder.encode(value));
                         }
-                        formDataStr += MessageFormat.format("{0}={1}", key, URLEncoder.encode(value));
                     }
+
                     for (int i = 0; i < ticketsDescriptions.size(); i++) {
                         HashMap<String, String> currentTicketDescription = ticketsDescriptions.get(i);
                         for (String field : ticketFields) {
@@ -267,6 +295,7 @@ public class UZRequests {
                         }
                     }
                     entity = new StringEntity(formDataStr, "UTF-8");
+                    //entity = new StringEntity("from=2208001&to=2200001&train=106%D0%A8&date=2016-11-30&round_trip=0&places[0][ord]=0&places[0][charline]=%D0%91&places[0][wagon_num]=3&places[0][wagon_class]=%D0%91&places[0][wagon_type]=%D0%9A&places[0][firstname]=dfghdfgh&places[0][lastname]=fghdfg&places[0][bedding]=1&places[0][child]=&places[0][stud]=&places[0][transportation]=0&places[0][reserve]=0&places[0][place_num]=4", "UTF-8");
 
                 } else {
                     for (Map.Entry<String, String> entry : formData.entrySet()) {
@@ -284,7 +313,6 @@ public class UZRequests {
                 //UrlEncodedFormEntity form_data = new UrlEncodedFormEntity(pairs, "UTF-8");
                 // String formData = EntityUtils.toString(new UrlEncodedFormEntity(pairs, "UTF-8"));
                 //formData = formData.replaceAll("%5B", "[").replace("%5D", "]");
-
 
 
 //                StringBuilder builder1 = new StringBuilder();

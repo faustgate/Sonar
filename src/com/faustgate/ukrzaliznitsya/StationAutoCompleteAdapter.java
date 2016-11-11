@@ -26,7 +26,7 @@ public class StationAutoCompleteAdapter extends BaseAdapter implements Filterabl
     private ArrayList<String> names = new ArrayList<>();
     private ArrayList<String> ids = new ArrayList<>();
     List<HashMap<String, String>> stations = new ArrayList<>();
-    private UZRequests uzr = new UZRequests();
+    private UZRequests uzr = UZRequests.getInstance();
 
     public StationAutoCompleteAdapter(Context context) {
         mContext = context;

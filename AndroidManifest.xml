@@ -25,5 +25,6 @@
         </activity>
         <activity android:name=".TrainListActivity"/>
         <activity android:name=".PlacesActivity"/>
+        <activity android:name=".BuyTicketActivity"/>
     </application>
 </manifest>

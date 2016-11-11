@@ -49,9 +49,8 @@ public class PlacesActivity extends Activity {
 
         try {
             JSONObject curTrain = new JSONObject(trainData);
-            UZRequests uzr = new UZRequests();
 
-            List<JSONObject> ticketsData = uzr.searchForTickets(curTrain);
+            List<JSONObject> ticketsData = UZRequests.getInstance().searchForTickets(curTrain);
 
             car_types = curTrain.getJSONArray("types");
 
@@ -122,9 +121,10 @@ public class PlacesActivity extends Activity {
                                     if (carNumber.equals(currentCarNumber)) {
                                         JSONObject coachObject = coachesList.getJSONObject(i);
 
-                                        currentTicketDescription.put("coach_num", coachObject.getString("num"));
-                                        currentTicketDescription.put("coach_class", coachObject.getString("coach_class"));
-                                        currentTicketDescription.put("coach_type_id", coachObject.getString("coach_type_id"));
+                                        currentTicketDescription.put("wagon_num", coachObject.getString("num"));
+                                        currentTicketDescription.put("charline", coachObject.getString("coach_class"));
+                                        currentTicketDescription.put("wagon_class", coachObject.getString("coach_class"));
+                                        currentTicketDescription.put("wagon_type", coachObject.getString("type"));
 
                                         JSONObject placesObject = coachObject.getJSONObject("places_list").getJSONObject("places");
 
@@ -178,12 +178,16 @@ public class PlacesActivity extends Activity {
                     currentTicketDescription.put("bedding", "1");
                     currentTicketDescription.put("child", "");
                     currentTicketDescription.put("stud", "");
-                    currentTicketDescription.put("transp", "0");
+                    currentTicketDescription.put("transportation", "0");
                     currentTicketDescription.put("reserve", "0");
 
                     placesDescription.add(currentTicketDescription);
-                    String ticketsData = uzr.buyTickets(curTrain, placesDescription);
+                    String ticketsData = UZRequests.getInstance().buyTickets(curTrain, placesDescription);
                     placesDescription.clear();
+                    Intent intent = new Intent(PlacesActivity.this, BuyTicketActivity.class);
+                    intent.putExtra("sesCookie", UZRequests.getInstance().getAuthCookie());
+                    intent.putExtra("authToken", UZRequests.getInstance().getAuthToken());
+                    startActivity(intent);
                 }
             });
 

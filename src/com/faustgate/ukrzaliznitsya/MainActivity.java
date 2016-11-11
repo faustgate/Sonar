@@ -47,8 +47,7 @@ public class MainActivity extends Activity {
                 String data = MessageFormat.format("{0} {1} {2} {3} {4}", stationFromName, stationFromId, stationToName,
                         stationToId, getDateString());
                 Toast.makeText(getApplicationContext(), data, Toast.LENGTH_LONG).show();
-                UZRequests uzr = new UZRequests();
-                String trainData = uzr.searchForTrains(stationFromId, stationToId, getDateString());
+                String trainData = UZRequests.getInstance().searchForTrains(stationFromId, stationToId, date.getTime());
 
                 Intent intent = new Intent(MainActivity.this, TrainListActivity.class);
                 intent.putExtra("trains", trainData);
