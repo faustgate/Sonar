@@ -17,7 +17,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class MainActivity extends Activity {
-    private Calendar date = Calendar.getInstance();
+    private Calendar date;
     private String stationFromId = "";
     private String stationFromName = "";
     private String stationToId = "";
@@ -32,7 +32,7 @@ public class MainActivity extends Activity {
     private boolean isArrStationCorrect = false;
     private DelayAutoCompleteTextView stationFromEdit;
     private DelayAutoCompleteTextView stationToEdit;
-    DatePickerDialog.OnDateSetListener dateSetListener = new DatePickerDialog.OnDateSetListener() {
+    private DatePickerDialog.OnDateSetListener dateSetListener = new DatePickerDialog.OnDateSetListener() {
 
         @Override
         public void onDateSet(DatePicker view, int year, int monthOfYear,
@@ -51,8 +51,6 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
 
-        date.add(Calendar.DAY_OF_MONTH, 1);
-
         stationFromEdit = (DelayAutoCompleteTextView) findViewById(R.id.stationFrom);
         stationToEdit = (DelayAutoCompleteTextView) findViewById(R.id.stationTo);
         // DatePicker start_date = (DatePicker) findViewById(R.id.datePicker);
@@ -67,7 +65,6 @@ public class MainActivity extends Activity {
         trainTypesSpinner.setAdapter(new ArrayAdapter<>(getApplicationContext(), android.R.layout.simple_spinner_item, trainTypes));
         buySpinner.setAdapter(new ArrayAdapter<>(getApplicationContext(), android.R.layout.simple_spinner_item, operationTypes));
         ticketTypeSpinner.setAdapter(new ArrayAdapter<>(getApplicationContext(), android.R.layout.simple_spinner_item, ticketTypes));
-
         buySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -84,7 +81,6 @@ public class MainActivity extends Activity {
 
             }
         });
-
         trainTypesSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -135,6 +131,7 @@ public class MainActivity extends Activity {
 
         //bookTitle.setThreshold(4);
         StationAutoCompleteAdapter adapter = new StationAutoCompleteAdapter(getApplicationContext());
+
         stationFromEdit.setAdapter(adapter);
         stationFromEdit.setLoadingIndicator((ProgressBar) findViewById(R.id.progress_bar));
         stationFromEdit.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -252,9 +249,18 @@ public class MainActivity extends Activity {
     }
 
     private void showDateDialog() {
-        new DatePickerDialog(MainActivity.this, dateSetListener, date
-                .get(Calendar.YEAR), date.get(Calendar.MONTH),
-                date.get(Calendar.DAY_OF_MONTH)).show();
+        date = Calendar.getInstance();
+        date.add(Calendar.DAY_OF_MONTH, 1);
+        DatePickerDialog datePickerDialog = new DatePickerDialog(MainActivity.this,
+                dateSetListener, date.get(Calendar.YEAR), date.get(Calendar.MONTH),
+                date.get(Calendar.DAY_OF_MONTH));
+
+        date.add(Calendar.DAY_OF_MONTH, -1);
+        datePickerDialog.getDatePicker().setMinDate(date.getTimeInMillis());
+        date.add(Calendar.DAY_OF_MONTH, 43);
+        datePickerDialog.getDatePicker().setMaxDate(date.getTimeInMillis());
+
+        datePickerDialog.show();
     }
 
     private void initStationFrom(HashMap<String, String> station) {
@@ -327,8 +333,9 @@ public class MainActivity extends Activity {
         startActivity(intent);
     }
 
-
     private void updateLabel() {
+        date = Calendar.getInstance();
+        date.add(Calendar.DAY_OF_MONTH, 1);
         String myFormat = "EEEE, MMMM dd, yyyy"; //In which you need put here
         SimpleDateFormat sdf = new SimpleDateFormat(myFormat, Locale.US);
         dateEditText.setText(sdf.format(date.getTime()));
