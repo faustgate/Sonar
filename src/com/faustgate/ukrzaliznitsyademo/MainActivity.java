@@ -14,6 +14,7 @@ import android.widget.*;
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 
 public class MainActivity extends Activity {
@@ -32,14 +33,17 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
+        Date yourTime = new Date();
 
-        date.add(Calendar.DAY_OF_MONTH, 1);
+
 
         stationFromEdit = (DelayAutoCompleteTextView) findViewById(R.id.stationFrom);
         stationToEdit = (DelayAutoCompleteTextView) findViewById(R.id.stationTo);
         DatePicker start_date = (DatePicker) findViewById(R.id.datePicker);
         Button search = (Button) findViewById(R.id.button);
 
+        start_date.setMinDate(date.getTimeInMillis());
+        date.add(Calendar.DAY_OF_MONTH, 1);
         start_date.init(date.get(Calendar.YEAR),
                 date.get(Calendar.MONTH),
                 date.get(Calendar.DAY_OF_MONTH),
@@ -49,6 +53,9 @@ public class MainActivity extends Activity {
                         date.set(year, monthOfYear, dayOfMonth);
                     }
                 });
+        date.add(Calendar.DAY_OF_MONTH, 43);
+        start_date.setMaxDate(date.getTimeInMillis());
+
 
         search.setOnClickListener(new View.OnClickListener() {
             @Override
