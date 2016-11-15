@@ -6,12 +6,16 @@
 
     <com.faustgate.ukrzaliznitsya.DelayAutoCompleteTextView
         android:id="@+id/stationFrom"
-        android:inputType="textCapSentences"
+        android:inputType="textCapSentences|textFilter"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
+        android:imeOptions="flagNoExtractUi"
         android:completionThreshold="2"
-        android:hint="From"/>
+        android:hint="From"
+        android:singleLine="true"
+        android:layout_marginBottom="20dp"
+        android:digits="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890-"
+        />
 
     <ProgressBar
         android:id="@+id/progress_bar"
@@ -19,34 +23,49 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical|right"
-        android:layout_marginRight="16dp"
-        android:layout_marginEnd="16dp"
-        android:visibility="gone"/>
-
+        android:layout_marginRight="5dp"
+        android:layout_marginEnd="5dp"
+        android:layout_marginTop="-45dp"
+        android:visibility="invisible"
+        />
 
     <com.faustgate.ukrzaliznitsya.DelayAutoCompleteTextView
         android:id="@+id/stationTo"
-        android:inputType="textCapSentences"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:imeOptions="flagNoExtractUi|actionSearch"
-
+        android:imeOptions="flagNoExtractUi"
         android:completionThreshold="2"
-        android:hint="To"/>
+        android:hint="To"
+        android:singleLine="true"
+        android:layout_marginBottom="20dp"
+        android:digits="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890-"
+        android:inputType="textCapSentences|textFilter"/>
 
+    <ProgressBar
+        android:id="@+id/progress_bar2"
+        style="?android:attr/progressBarStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical|right"
+        android:layout_marginRight="5dp"
+        android:layout_marginEnd="5dp"
+        android:layout_marginTop="-45dp"
+        android:visibility="invisible"
+        />
 
     <DatePicker
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/datePicker"
         android:spinnersShown="false"
-        android:layout_gravity="center_horizontal"/>
+        android:layout_marginTop="20dp"
+        android:layout_gravity="center_horizontal"
+        />
 
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="New Button"
-        android:id="@+id/button"
-        />
+        android:text="Search"
+        android:id="@+id/button"/>
 
 </LinearLayout>
