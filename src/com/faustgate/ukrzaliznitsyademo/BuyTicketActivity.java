@@ -1,4 +1,4 @@
-package com.faustgate.ukrzaliznitsya;
+package com.faustgate.ukrzaliznitsyademo;
 
 import android.app.Activity;
 import android.content.Intent;
