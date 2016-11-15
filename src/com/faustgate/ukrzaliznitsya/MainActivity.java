@@ -32,6 +32,18 @@ public class MainActivity extends Activity {
     private boolean isArrStationCorrect = false;
     private DelayAutoCompleteTextView stationFromEdit;
     private DelayAutoCompleteTextView stationToEdit;
+    DatePickerDialog.OnDateSetListener dateSetListener = new DatePickerDialog.OnDateSetListener() {
+
+        @Override
+        public void onDateSet(DatePicker view, int year, int monthOfYear,
+                              int dayOfMonth) {
+            // TODO Auto-generated method stub
+            date.set(Calendar.YEAR, year);
+            date.set(Calendar.MONTH, monthOfYear);
+            date.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+            updateLabel();
+        }
+    };
 
 
     @Override
@@ -105,29 +117,21 @@ public class MainActivity extends Activity {
             }
         });
 
-        DatePickerDialog.OnDateSetListener dateSetListener = new DatePickerDialog.OnDateSetListener() {
-
-            @Override
-            public void onDateSet(DatePicker view, int year, int monthOfYear,
-                                  int dayOfMonth) {
-                // TODO Auto-generated method stub
-                date.set(Calendar.YEAR, year);
-                date.set(Calendar.MONTH, monthOfYear);
-                date.set(Calendar.DAY_OF_MONTH, dayOfMonth);
-                updateLabel();
-            }
-        };
-
         dateEditText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
                 if (hasFocus) {
-                    new DatePickerDialog(MainActivity.this, dateSetListener, date
-                            .get(Calendar.YEAR), date.get(Calendar.MONTH),
-                            date.get(Calendar.DAY_OF_MONTH)).show();
+                    showDateDialog();
                 }
             }
         });
+        dateEditText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showDateDialog();
+            }
+        });
+
 
         //bookTitle.setThreshold(4);
         StationAutoCompleteAdapter adapter = new StationAutoCompleteAdapter(getApplicationContext());
@@ -212,7 +216,6 @@ public class MainActivity extends Activity {
                     stationToEdit.setSelection(stationToEdit.getText().length());
             }
         });
-
         stationToEdit.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
@@ -232,7 +235,6 @@ public class MainActivity extends Activity {
                 return true;
             }
         });
-
         stationToEdit.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -247,6 +249,12 @@ public class MainActivity extends Activity {
             public void afterTextChanged(Editable s) {
             }
         });
+    }
+
+    private void showDateDialog() {
+        new DatePickerDialog(MainActivity.this, dateSetListener, date
+                .get(Calendar.YEAR), date.get(Calendar.MONTH),
+                date.get(Calendar.DAY_OF_MONTH)).show();
     }
 
     private void initStationFrom(HashMap<String, String> station) {
