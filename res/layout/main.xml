@@ -19,9 +19,11 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical|right"
-        android:layout_marginRight="16dp"
-        android:layout_marginEnd="16dp"
-        android:visibility="gone"/>
+        android:layout_marginRight="5dp"
+        android:layout_marginEnd="5dp"
+        android:layout_marginTop="-45dp"
+        android:visibility="invisible"
+        />
 
 
     <com.faustgate.ukrzaliznitsya.DelayAutoCompleteTextView
@@ -34,13 +36,53 @@
         android:completionThreshold="2"
         android:hint="To"/>
 
-
-    <DatePicker
+    <ProgressBar
+        android:id="@+id/progress_bar2"
+        style="?android:attr/progressBarStyleSmall"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/datePicker"
-        android:spinnersShown="false"
+        android:layout_gravity="center_vertical|right"
+        android:layout_marginRight="5dp"
+        android:layout_marginEnd="5dp"
+        android:layout_marginTop="-45dp"
+        android:visibility="invisible"
+        />
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/dateEditText"
         android:layout_gravity="center_horizontal"/>
+
+    <Spinner
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/trainTypeSpinner"
+        android:layout_gravity="center_horizontal"/>
+
+    <Spinner
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/carTypeSpinner"
+        android:layout_gravity="center_horizontal"/>
+
+    <Spinner
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/buySpinner"
+        android:layout_gravity="center_horizontal"/>
+
+    <Spinner
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/ticketTypeSpinner"
+        android:layout_gravity="center_horizontal"/>
+
+    <CheckBox
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="New CheckBox"
+        android:id="@+id/checkBox3"/>
 
     <Button
         android:layout_width="match_parent"
