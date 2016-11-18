@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:orientation="vertical"
-              android:layout_width="fill_parent"
-              android:layout_height="fill_parent">
+<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+             android:orientation="vertical"
+             android:layout_width="match_parent"
+             android:layout_height="match_parent">
 
     <com.faustgate.ukrzaliznitsya.DelayAutoCompleteTextView
         android:id="@+id/stationFrom"
@@ -60,29 +60,80 @@
         android:id="@+id/dateEditText"
         android:layout_gravity="center_horizontal"/>
 
-    <Spinner
-        android:layout_width="match_parent"
+    <TableRow
         android:layout_height="wrap_content"
-        android:id="@+id/trainTypeSpinner"
-        android:layout_gravity="center_horizontal"/>
+        android:layout_width="match_parent">
 
-    <Spinner
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/carTypeSpinner"
-        android:layout_gravity="center_horizontal"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:text="Тип поезда:"
+            android:id="@+id/textView"
+            android:layout_gravity="center_vertical|right"/>
 
-    <Spinner
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/buySpinner"
-        android:layout_gravity="center_horizontal"/>
 
-    <Spinner
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/ticketTypeSpinner"
-        android:layout_gravity="center_horizontal"/>
+        <Spinner
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/trainTypeSpinner"
+            android:layout_weight="0.1"
+            />
+    </TableRow>
+
+    <TableRow>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:text="Класс места:"
+            android:id="@+id/textView2"
+            android:layout_gravity="center_vertical|right"/>
+
+
+        <Spinner
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/carTypeSpinner"
+            android:layout_weight="0.1"/>
+    </TableRow>
+
+    <TableRow>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:text="Операция:"
+            android:id="@+id/textView3"
+            android:layout_gravity="center_vertical|right"/>
+
+
+        <Spinner
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/buySpinner"
+            android:layout_weight="0.1"/>
+    </TableRow>
+
+    <TableRow>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:text="Тип билета:"
+            android:id="@+id/textView4"
+            android:layout_gravity="center_vertical|right"/>
+
+
+        <Spinner
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/ticketTypeSpinner"
+            android:layout_weight="0.1"/>
+    </TableRow>
 
     <CheckBox
         android:layout_width="wrap_content"
@@ -96,4 +147,4 @@
         android:text="Search"
         android:id="@+id/button"/>
 
-</LinearLayout>
+</TableLayout>

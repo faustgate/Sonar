@@ -108,7 +108,7 @@ class UZRequests {
         formData.put("time_dep", "00:00");
         formData.put("time_dep_till", "");
         formData.put("another_ec", "0");
-        String result = null;
+        String result = "";
         try {
             Object res = new GetUZData().execute("http://booking.uz.gov.ua/en/purchase/search/").get();
             result = StringEscapeUtils.unescapeJava(res.toString());

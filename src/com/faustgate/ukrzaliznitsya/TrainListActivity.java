@@ -28,10 +28,10 @@ public class TrainListActivity extends Activity {
         String trainsData = intent.getStringExtra("trains");
 
         try {
-            obj = new JSONObject(trainsData);
-            trains = obj.getJSONArray("value");
+            trains = new JSONArray(trainsData);
         } catch (JSONException e) {
             e.printStackTrace();
+            return;
         }
 
         TrainListAdapter trainAdapter = new TrainListAdapter(getApplicationContext(), trains);
