@@ -1,4 +1,4 @@
-package com.faustgate.ukrzaliznitsya;
+package com.faustgate.sonar;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -18,9 +18,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
-/**
- * Created by sergey.puronen on 10/12/16.
- */
 public class PlacesActivity extends Activity {
     private JSONArray car_types;
     private ArrayAdapter<String> adapter;
@@ -34,6 +31,8 @@ public class PlacesActivity extends Activity {
 
         Intent intent = getIntent();
         String trainData = intent.getStringExtra("train");
+        String name = intent.getStringExtra("name");
+        String surname = intent.getStringExtra("surname");
 
         List<String> placeTypes = new ArrayList<>();
         List<String> carNumbers = new ArrayList<>();
@@ -55,7 +54,7 @@ public class PlacesActivity extends Activity {
             car_types = curTrain.getJSONArray("types");
 
 
-            placeTypes.add("Выберите тип места");
+            placeTypes.add(getString(R.string.select_place_type));
             for (int i = 0; i < car_types.length(); i++) {
                 JSONObject placeType = car_types.getJSONObject(i);
                 placeTypes.add(MessageFormat.format("{0} - {1}", placeType.getString("title"), placeType.getString("places")));
@@ -71,7 +70,7 @@ public class PlacesActivity extends Activity {
                             if (carNumbers.size() > 0) {
                                 carNumbers.clear();
                             }
-                            carNumbers.add("Выберите вагон");
+                            carNumbers.add(getString(R.string.select_car));
 
                             String placeType = car_types.getJSONObject(position - 1).getString("letter");
                             for (JSONObject ticketData : ticketsData) {
@@ -112,7 +111,7 @@ public class PlacesActivity extends Activity {
                             if (placeNumbers.size() > 0) {
                                 placeNumbers.clear();
                             }
-                            placeNumbers.add("Выберите место");
+                            placeNumbers.add(getString(R.string.select_place));
                             String carNumber = carNumbers.get(position);
                             for (JSONObject ticketData : ticketsData) {
                                 JSONArray coachesList = ticketData.getJSONArray("coaches");
@@ -173,8 +172,8 @@ public class PlacesActivity extends Activity {
                 @Override
                 public void onClick(View v) {
                     currentTicketDescription.put("ord", "0");
-                    currentTicketDescription.put("firstname", "gsdfgs");
-                    currentTicketDescription.put("lastname", "sdfgsfgs");
+                    currentTicketDescription.put("firstname", name);
+                    currentTicketDescription.put("lastname", surname);
                     currentTicketDescription.put("bedding", "1");
                     currentTicketDescription.put("child", "");
                     currentTicketDescription.put("stud", "");
@@ -185,8 +184,6 @@ public class PlacesActivity extends Activity {
                     String ticketsData = UZRequests.getInstance().buyTickets(curTrain, placesDescription);
                     placesDescription.clear();
                     Intent intent = new Intent(PlacesActivity.this, BuyTicketActivity.class);
-                    intent.putExtra("sesCookie", UZRequests.getInstance().getAuthCookie());
-                    intent.putExtra("authToken", UZRequests.getInstance().getAuthToken());
                     startActivity(intent);
                 }
             });

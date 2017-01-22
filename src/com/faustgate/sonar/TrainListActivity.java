@@ -1,4 +1,4 @@
-package com.faustgate.ukrzaliznitsya;
+package com.faustgate.sonar;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -13,9 +13,6 @@ import org.json.JSONObject;
 
 import java.text.MessageFormat;
 
-/**
- * Created by sergey.puronen on 10/12/16.
- */
 public class TrainListActivity extends Activity {
     private JSONObject obj = null;
     private JSONArray trains = null;
@@ -24,14 +21,22 @@ public class TrainListActivity extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        SoundNotifier.getInstance(getApplicationContext()).stopSound();
+        Intent intent1 = new Intent(this, TicketFinderService.class);
+        stopService(intent1);
+
         Intent intent = getIntent();
         String trainsData = intent.getStringExtra("trains");
+        String name = intent.getStringExtra("name");
+        String surname = intent.getStringExtra("surname");
 
         try {
             trains = new JSONArray(trainsData);
         } catch (JSONException e) {
             e.printStackTrace();
             return;
+        } catch (NullPointerException e) {
+            e.printStackTrace();
         }
 
         TrainListAdapter trainAdapter = new TrainListAdapter(getApplicationContext(), trains);
@@ -50,6 +55,9 @@ public class TrainListActivity extends Activity {
 
                     Intent intent = new Intent(TrainListActivity.this, PlacesActivity.class);
                     intent.putExtra("train", curTrain);
+                    intent.putExtra("name", name);
+                    intent.putExtra("surname", surname);
+
                     startActivity(intent);
 
                 } catch (JSONException e) {

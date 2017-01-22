@@ -1,4 +1,4 @@
-package com.faustgate.ukrzaliznitsya;
+package com.faustgate.sonar;
 
 import android.content.Context;
 import android.os.Handler;

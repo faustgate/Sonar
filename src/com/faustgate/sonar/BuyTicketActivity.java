@@ -1,4 +1,4 @@
-package com.faustgate.ukrzaliznitsya;
+package com.faustgate.sonar;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -16,8 +16,11 @@ public class BuyTicketActivity extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        Intent intent = getIntent();
-        String sesCookie = intent.getStringExtra("sesCookie");
+        Intent intent = new Intent(this, TicketFinderService.class);
+        stopService(intent);
+        SoundNotifier.getInstance(getApplicationContext()).stopSound();
+
+        String sesCookie = UZRequests.getInstance().getAuthCookie();
 
         setContentView(R.layout.buy_ticket_layout);
 
@@ -29,7 +32,6 @@ public class BuyTicketActivity extends Activity {
         webView.getSettings().setJavaScriptCanOpenWindowsAutomatically(true);
         webView.getSettings().setAppCacheEnabled(true);
         webView.getSettings().setSupportZoom(true);
-        webView.getSettings().setBuiltInZoomControls(true);
         webView.getSettings().setDomStorageEnabled(true);
         webView.setWebViewClient(new WebViewClient() {
             @Override
@@ -52,7 +54,7 @@ public class BuyTicketActivity extends Activity {
         cookieManager.setAcceptCookie(true);
         CookieSyncManager.getInstance().sync();
 
-        webView.loadUrl(url + "/en/mobile/cart/");
+        webView.loadUrl(url + getString(R.string.cart_address));
         // webView.setInitialScale(70);
     }
 }

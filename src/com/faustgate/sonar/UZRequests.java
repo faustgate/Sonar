@@ -1,5 +1,6 @@
-package com.faustgate.ukrzaliznitsya;
+package com.faustgate.sonar;
 
+import android.content.Context;
 import android.os.AsyncTask;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.http.Header;
@@ -17,6 +18,7 @@ import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URLEncoder;
 import java.text.MessageFormat;
@@ -30,6 +32,7 @@ import java.util.concurrent.ExecutionException;
 
 class UZRequests {
     private static UZRequests mInstance = null;
+    private Context mContext = null;
     private Map<String, String> headers = new HashMap<>();
     private Map<String, String> formData = new HashMap<>();
     private Map<String, List<String>> lastHeaders;
@@ -38,17 +41,16 @@ class UZRequests {
     private List<String> formFields = Arrays.asList("from", "to", "train", "date", "round_trip");
     private boolean isAuthDataPresent = false;
     private String auth_token;
+    private String reservationId;
     private ArrayList<HashMap<String, String>> ticketsDescriptions;
     private boolean isBuying = false;
+    private boolean refreshTokens = true;
     private Date dateDep;
-    private String rem_head = "<script>var em = $v.rot13(GV.site.email_support);$$v('#contactEmail')." +
-            "attach({ href: 'mailto:' + em, innerHTML: em});" +
-            "$v.domReady(function () {Common.performModule();" +
-            "Common.pageInformation();" +
-            "Common.setOpacHover($$v('#footer .cards_ribbon a, #footer .left a')," +
-            " 50);Common.setOpacHover($$v('#footer .right a'), 70);});var _gaq =" +
-            " _gaq || [];_gaq.push(['_setAccount', 'UA-33134148-1']);_gaq.push" +
-            "(['_trackPageview']);";
+    private String rem_head = "<script>var em = $v.rot13(GV.site.email_support);" +
+            "$$v('#contactEmail').attach({ href: 'mailto:' + em, innerHTML: em});" +
+            "$v.domReady(function () {Common.performModule();Common.pageInformation();" +
+            "Common.setOpacHover($$v('#footer .cards_ribbon a, #footer .left a'), 50);" +
+            "Common.setOpacHover($$v('#footer .right a'), 70);});";
     private String rem_foot = "(function () {var ga = document.createElement('script');" +
             "ga.async = true;" +
             "ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + " +
@@ -56,17 +58,30 @@ class UZRequests {
             "var s = document.getElementsByTagName('script')[0];s.parentNode.insertBefore(ga, s);})();";
 
 
-    UZRequests() {
+    private UZRequests() {
         headers.put("Referer", "http://booking.uz.gov.ua");
         headers.put("User-Agent", "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 " +
                 "(KHTML, like Gecko) Chrome/52.0.2743.82 Safari/537.36");
     }
 
-    public static UZRequests getInstance() {
+
+    static UZRequests getInstance(Context context) {
+        if (mInstance == null) {
+            mInstance = new UZRequests();
+        }
+        mInstance.setContext(context);
+        return mInstance;
+    }
+
+    static UZRequests getInstance() {
         if (mInstance == null) {
             mInstance = new UZRequests();
         }
         return mInstance;
+    }
+
+    private void setContext(Context mContext) {
+        this.mContext = mContext;
     }
 
     private void initFormData() {
@@ -83,7 +98,7 @@ class UZRequests {
 
         List<HashMap<String, String>> stations = new ArrayList<>();
         try {
-            res = new GetUZData().execute("http://booking.uz.gov.ua/en/purchase/station/" + first_letters).get();
+            res = new GetUZData().execute(mContext.getString(R.string.base_url) + "/purchase/station/" + first_letters).get();
             dataJsonObj = new JSONObject(res);
             JSONArray stt = dataJsonObj.getJSONArray("value");
             for (int i = 0; i < stt.length(); i++) {
@@ -104,13 +119,13 @@ class UZRequests {
         dateDep = date;
         formData.put("station_id_from", station_from_id);
         formData.put("station_id_till", station_to_id);
-        formData.put("date_dep", new SimpleDateFormat("MM.dd.yyyy").format(dateDep.getTime()));
+        formData.put("date_dep", new SimpleDateFormat(mContext.getString(R.string.date_format)).format(dateDep.getTime()));
         formData.put("time_dep", "00:00");
         formData.put("time_dep_till", "");
         formData.put("another_ec", "0");
         String result = "";
         try {
-            Object res = new GetUZData().execute("http://booking.uz.gov.ua/en/purchase/search/").get();
+            Object res = new GetUZData().execute(mContext.getString(R.string.base_url) + "/purchase/search/").get();
             result = StringEscapeUtils.unescapeJava(res.toString());
         } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
@@ -143,7 +158,7 @@ class UZRequests {
                 String placeId = trainInfo.getJSONArray("types").getJSONObject(i).getString("letter");
                 formData.put("coach_type", placeId);
 
-                res = new GetUZData().execute("http://booking.uz.gov.ua/en/purchase/coaches/").get();
+                res = new GetUZData().execute(mContext.getString(R.string.base_url) + "/purchase/coaches/").get();
 
                 JSONObject coachesInfo = new JSONObject(res.toString());
                 JSONArray availableCars = coachesInfo.getJSONArray("coaches");
@@ -161,7 +176,7 @@ class UZRequests {
                     formData.put("coach_num", coachNum);
                     formData.put("coach_class", coachClass);
                     formData.put("coach_type_id", coachTypeId);
-                    res = new GetUZData().execute("http://booking.uz.gov.ua/en/purchase/coach/").get();
+                    res = new GetUZData().execute(mContext.getString(R.string.base_url) + "/purchase/coach/").get();
                     JSONObject coachInfo = new JSONObject(res.toString());
                     JSONObject placesList = coachInfo.getJSONObject("value");
                     availableCars.getJSONObject(j).put("places_list", placesList);
@@ -192,23 +207,42 @@ class UZRequests {
 
             ticketsDescriptions = ticketDescriptions;
             isBuying = true;
-            Object res = new GetUZData().execute("http://booking.uz.gov.ua/en/cart/add/").get();
+            Object res = new GetUZData().execute(mContext.getString(R.string.base_url) + "/cart/add/").get();
+            isBuying = false;
             result = StringEscapeUtils.unescapeJava(res.toString());
-            String asdf = "asdfa";
         } catch (InterruptedException | ExecutionException | JSONException e) {
             e.printStackTrace();
         }
         return "result";
     }
 
+    String revokeTickets() {
+        String result = "";
+        try {
+            initFormData();
+            formData.put("reserve_ids", reservationId);
+            Object res = new GetUZData().execute(mContext.getString(R.string.base_url) + "cart/revocation/").get();
+            result = StringEscapeUtils.unescapeJava(res.toString());
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
+
+    void setRefreshTokens() {
+        refreshTokens = true;
+    }
+
     private String getAuthData(String page) {
         String token = "";
-        String script = page.substring(page.lastIndexOf("<script>"), page.lastIndexOf("</script>"));
-        script = script.replace(rem_head, "").replace(rem_foot, "");
         try {
+            String script = page.substring(page.lastIndexOf("<script>"), page.lastIndexOf("</script>"));
+            script = script.replace(rem_head, "");
             token = new JJDecoder(script).decode().split("\"")[3];
         } catch (Exception e) {
+            LogSystem.e("UKRZaliznitsya", MessageFormat.format("Error in getAuthData, page is: {}", page));
             e.printStackTrace();
+            return "";
         }
         headers.put("GV-Token", token);
         headers.put("GV-Ajax", "1");
@@ -219,6 +253,7 @@ class UZRequests {
         }
         String cookie = str.replace("Set-Cookie:", "");
         headers.put("Cookie", cookie);
+        refreshTokens = false;
         return token;
     }
 
@@ -234,11 +269,27 @@ class UZRequests {
         dateDep = date_dep;
     }
 
+    private String getStringFromStream(InputStream stream) {
+        String res = "";
+        try {
+            StringBuilder builder = new StringBuilder();
+            BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
+            String line;
+            while ((line = reader.readLine()) != null) {
+                builder.append(line);
+            }
+            res = builder.toString();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return res;
+    }
+
     private class GetUZData extends AsyncTask<String, Void, String> {
 
         protected String doInBackground(String... urls) {
-            if (!isAuthDataPresent) {
-                String page = performRequest("http://booking.uz.gov.ua/en");
+            if ((!isAuthDataPresent) || refreshTokens) {
+                String page = performRequest(mContext.getString(R.string.base_url));
                 auth_token = getAuthData(page);
                 isAuthDataPresent = true;
             }
@@ -338,22 +389,26 @@ class UZRequests {
 //                }
 //                Request request = requestBuilder.build();
 //                Response response = client.newCall(request).execute();
+
+                String msg = MessageFormat.format("Request on {0} with params {1}", url_adr,
+                        getStringFromStream(entity.getContent()));
+
+                LogSystem.i("UKRZaliznitsya", msg);
                 HttpResponse response = client.execute(post);
 
                 if (cookies.length == 0)
                     cookies = response.getHeaders("Set-Cookie");
-
-
-                StringBuilder builder = new StringBuilder();
-                BufferedReader reader = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    builder.append(line);
-                }
-                response_string = builder.toString();
+                if (isBuying)
+                    try {
+                        reservationId = response.getHeaders("Uz-Txn")[0].getValue();
+                    } catch (IndexOutOfBoundsException e) {
+                        e.printStackTrace();
+                    }
+                response_string = getStringFromStream(response.getEntity().getContent());
             } catch (IOException e) {
                 e.printStackTrace();
             }
+            LogSystem.i("UKRZaliznitsya", MessageFormat.format("Response: {0}", response_string));
             return response_string;
         }
     }

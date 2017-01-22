@@ -1,10 +1,12 @@
-package com.faustgate.ukrzaliznitsya;
+package com.faustgate.sonar;
 
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
+import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.ApplicationInfo;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -22,21 +24,27 @@ import java.util.*;
 
 public class MainActivity extends Activity {
     private Calendar date = Calendar.getInstance();
+    Spinner buySpinner;
     private String stationFromId = "";
     private String stationFromName = "";
     private String stationToId = "";
     private String stationToName = "";
     private EditText dateEditText;
-    private List<String> trainTypes = initTrainTypes();
-    private List<String> ICCarTypes = initICCarTypes();
-    private List<String> usualTrainTypes = initUsualCarTypes();
-    private List<String> operationTypes = Arrays.asList("Покупка", "Бронь");
-    private List<String> ticketTypes = Arrays.asList("Обычный", "Детский", "Студенческий");
+    private EditText nameEditText;
+    private EditText surnameEditText;
+    private List<String> trainTypes, ICCarTypes, usualTrainTypes, operationTypes, ticketTypes;
+    private List<String> placesAmount = Arrays.asList("1", "2", "3", "4", "5", "6", "7", "8");
     private boolean isDepStationCorrect = false;
     private boolean isArrStationCorrect = false;
     private DelayAutoCompleteTextView stationFromEdit, stationToEdit;
     private Map<String, String> targetTicketDescription = new HashMap<>();
     private String foundData;
+    private String action = "no";
+    private String name = "";
+    private String surname = "";
+    private String notification = "statbar";
+    private String ticketType;
+    private boolean isBuying;
 
 
     private DatePickerDialog.OnDateSetListener dateSetListener = new DatePickerDialog.OnDateSetListener() {
@@ -48,6 +56,13 @@ public class MainActivity extends Activity {
             date.set(Calendar.YEAR, year);
             date.set(Calendar.MONTH, monthOfYear);
             date.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+            if (date.getTimeInMillis() - System.currentTimeMillis() >= 86400000) {
+                buySpinner.setEnabled(true);
+            } else {
+                buySpinner.setSelection(0);
+                buySpinner.setEnabled(false);
+            }
+
             updateLabel();
         }
     };
@@ -104,29 +119,48 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
+        boolean isDebuggable = (0 != (getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE));
+        LogSystem.setDebugLogging(isDebuggable);
+        trainTypes = initTrainTypes();
+        ICCarTypes = initICCarTypes();
+        usualTrainTypes = initUsualCarTypes();
+        operationTypes = Arrays.asList(getString(R.string.operation_buying),
+                getString(R.string.operation_booking));
+        ticketTypes = Arrays.asList(getString(R.string.ticket_usual),
+                getString(R.string.ticket_child),
+                getString(R.string.ticket_stud));
 
         stationFromEdit = (DelayAutoCompleteTextView) findViewById(R.id.stationFrom);
         stationToEdit = (DelayAutoCompleteTextView) findViewById(R.id.stationTo);
-        // DatePicker start_date = (DatePicker) findViewById(R.id.datePicker);
+
         Button search = (Button) findViewById(R.id.button);
+
         dateEditText = (EditText) findViewById(R.id.dateEditText);
-        DatePickerDialog datePickerDialog = initDateDialog();
+        nameEditText = (EditText) findViewById(R.id.nameEditText);
+        surnameEditText = (EditText) findViewById(R.id.surnameEditText);
+
+        DatePickerDialog datePickerDialog = new CustomDatePickerDialog(MainActivity.this, dateSetListener);
         updateLabel();
+
         Spinner trainTypesSpinner = (Spinner) findViewById(R.id.trainTypeSpinner);
         Spinner carTypeSpinner = (Spinner) findViewById(R.id.carTypeSpinner);
-        Spinner buySpinner = (Spinner) findViewById(R.id.buySpinner);
+        buySpinner = (Spinner) findViewById(R.id.buySpinner);
         Spinner ticketTypeSpinner = (Spinner) findViewById(R.id.ticketTypeSpinner);
+        Spinner placesAmountSpinner = (Spinner) findViewById(R.id.ticketAmountPicker);
 
-        trainTypesSpinner.setAdapter(new ArrayAdapter<>(getApplicationContext(), android.R.layout.simple_spinner_item, trainTypes));
+
         buySpinner.setAdapter(new ArrayAdapter<>(getApplicationContext(), android.R.layout.simple_spinner_item, operationTypes));
+        trainTypesSpinner.setAdapter(new ArrayAdapter<>(getApplicationContext(), android.R.layout.simple_spinner_item, trainTypes));
         ticketTypeSpinner.setAdapter(new ArrayAdapter<>(getApplicationContext(), android.R.layout.simple_spinner_item, ticketTypes));
+        placesAmountSpinner.setAdapter(new ArrayAdapter<>(getApplicationContext(), android.R.layout.simple_spinner_item, placesAmount));
+
         buySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                if (position == 1) {
-                    ticketTypeSpinner.setEnabled(false);
-                } else {
-                    ticketTypeSpinner.setEnabled(true);
+                isBuying = position == 0;
+                ticketTypeSpinner.setEnabled(position == 0);
+                if (position != 0) {
+                    ticketTypeSpinner.setSelection(0);
                 }
             }
 
@@ -168,10 +202,36 @@ public class MainActivity extends Activity {
 
             }
         });
+        ticketTypeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                switch (position) {
+                    case 0:
+                        ticketType = "";
+                        break;
+                    case 1:
+                        ticketType = "child";
+                        break;
+                    case 2:
+                        ticketType = "stud";
+                        break;
+                }
+
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
+        buySpinner.setEnabled(false);
 
         search.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                name = nameEditText.getText().toString();
+                surname = surnameEditText.getText().toString();
                 start();
             }
         });
@@ -201,7 +261,6 @@ public class MainActivity extends Activity {
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
                 HashMap<String, String> station = (HashMap<String, String>) adapterView.getItemAtPosition(position);
                 initStationFrom(station);
-                stationFromEdit.setText(stationFromName);
                 adapter.clear();
             }
         });
@@ -213,7 +272,6 @@ public class MainActivity extends Activity {
                         if (adapter.getCount() > 0) {
                             HashMap<String, String> station = adapter.getItem(0);
                             initStationFrom(station);
-                            stationFromEdit.setSelection(stationFromEdit.getText().length());
                         } else {
                             Toast.makeText(getApplicationContext(), "Wrong departure station", Toast.LENGTH_LONG).show();
                         }
@@ -246,7 +304,6 @@ public class MainActivity extends Activity {
             }
         });
 
-
         stationToEdit.setAdapter(adapter2);
         stationToEdit.setLoadingIndicator((ProgressBar) findViewById(R.id.progress_bar2));
         stationToEdit.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -266,7 +323,6 @@ public class MainActivity extends Activity {
                         if (adapter2.getCount() > 0) {
                             HashMap<String, String> station = adapter2.getItem(0);
                             initStationTo(station);
-                            stationToEdit.setSelection(stationToEdit.getText().length());
                         } else {
                             Toast.makeText(getApplicationContext(), "Wrong arrival station", Toast.LENGTH_LONG).show();
                         }
@@ -280,18 +336,13 @@ public class MainActivity extends Activity {
         stationToEdit.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                if (!isArrStationCorrect) {
-                    if (adapter2.getCount() > 0) {
-                        HashMap<String, String> station = adapter.getItem(0);
-                        initStationTo(station);
-                        adapter2.clear();
-                        isArrStationCorrect = true;
-                    }
+                if (adapter2.getCount() > 0) {
+                    HashMap<String, String> station = adapter2.getItem(0);
+                    initStationTo(station);
+                    adapter2.clear();
                 }
-                if (isDepStationCorrect) {
-                    start();
-                } else {
-                    stationFromEdit.requestFocus();
+                if (isDepStationCorrect && isArrStationCorrect) {
+                    dateEditText.requestFocus();
                 }
                 return true;
             }
@@ -312,24 +363,6 @@ public class MainActivity extends Activity {
         });
     }
 
-    private DatePickerDialog initDateDialog() {
-        DatePickerDialog datePickerDialog = new DatePickerDialog(MainActivity.this,
-                dateSetListener, date.get(Calendar.YEAR), date.get(Calendar.MONTH),
-                date.get(Calendar.DAY_OF_MONTH));
-
-        datePickerDialog.getDatePicker().setMinDate(date.getTimeInMillis());
-        date.add(Calendar.DAY_OF_MONTH, 1);
-
-        datePickerDialog.getDatePicker().init(date.get(Calendar.YEAR),
-                date.get(Calendar.MONTH),
-                date.get(Calendar.DAY_OF_MONTH), null);
-
-        date.add(Calendar.DAY_OF_MONTH, 43);
-        datePickerDialog.getDatePicker().setMaxDate(date.getTimeInMillis());
-        date.add(Calendar.DAY_OF_MONTH, -43);
-        return datePickerDialog;
-    }
-
     private String getDateString() {
         SimpleDateFormat spf = new SimpleDateFormat("MM.dd.yyyy");
         return spf.format(date.getTime());
@@ -339,17 +372,20 @@ public class MainActivity extends Activity {
         stationFromName = station.get("title");
         stationFromId = station.get("station_id");
         stationFromEdit.setText(stationFromName);
+        stationFromEdit.setSelection(stationFromEdit.getText().length());
         isDepStationCorrect = true;
     }
 
     private void initStationTo(HashMap<String, String> station) {
-        stationToName = station.get("title");
         stationToId = station.get("station_id");
+        stationToName = station.get("title");
         stationToEdit.setText(stationToName);
+        stationToEdit.setSelection(stationToEdit.getText().length());
         isArrStationCorrect = true;
     }
 
     private void start() {
+
         if (validate()) {
             String data = MessageFormat.format("{0} {1} {2} {3} {4}",
                     stationFromName,
@@ -419,6 +455,8 @@ public class MainActivity extends Activity {
                 if (corrPlacesTrains.length() > 0) {
                     Intent intent = new Intent(MainActivity.this, TrainListActivity.class);
                     intent.putExtra("trains", corrPlacesTrains.toString());
+                    intent.putExtra("name", name);
+                    intent.putExtra("surname", surname);
                     startActivity(intent);
                 }
             } catch (JSONException e) {
@@ -430,27 +468,47 @@ public class MainActivity extends Activity {
     }
 
     private void updateLabel() {
-        String myFormat = "EEEE, MMMM dd, yyyy"; //In which you need put here
-        SimpleDateFormat sdf = new SimpleDateFormat(myFormat, Locale.US);
-        dateEditText.setText(sdf.format(date.getTime()));
+        String myFormat = getString(R.string.user_date_format);
+        SimpleDateFormat sdf = new SimpleDateFormat(myFormat, getResources().getConfiguration().locale);
+        if (dateEditText.length() == 0) {
+            date.add(Calendar.DAY_OF_MONTH, 1);
+        }
+        String dateStr = sdf.format(date.getTime());
+        dateStr = dateStr.substring(0, 1).toUpperCase() + dateStr.substring(1);
+        dateEditText.setText(dateStr);
     }
 
     private boolean validate() {
         if (!isDepStationCorrect) {
-            showErrorMessage("Wrong departure station!", "Departure station wrong or empty");
+            showErrorMessage(getString(R.string.err_wrong_dep_station_head), getString(R.string.err_wrong_dep_station_body));
             stationFromEdit.requestFocus();
             return false;
         }
         if (!isArrStationCorrect) {
-            showErrorMessage("Wrong arrival station!", "Arrival station wrong or empty");
+            showErrorMessage(getString(R.string.err_wrong_arr_station_head),
+                    getString(R.string.err_wrong_arr_station_body));
             stationToEdit.requestFocus();
             return false;
         }
         if (stationFromId.equals(stationToId)) {
-            showErrorMessage("Same stations", "Arrival and departure stations are the same");
+            showErrorMessage(getString(R.string.err_same_stations_head),
+                    getString(R.string.err_same_stations_head));
             stationFromEdit.requestFocus();
             return false;
         }
+        if (nameEditText.length() == 0) {
+            showErrorMessage(getString(R.string.err_fill_name_head),
+                    getString(R.string.err_fill_name_body));
+            nameEditText.requestFocus();
+            return false;
+        }
+        if (surnameEditText.length() == 0) {
+            showErrorMessage(getString(R.string.err_fill_surname_head),
+                    getString(R.string.err_fill_surname_body));
+            surnameEditText.requestFocus();
+            return false;
+        }
+
         return true;
     }
 
@@ -467,19 +525,17 @@ public class MainActivity extends Activity {
     }
 
     private void showTrainOptionsMessage() {
-        AlertDialog dialog = new AlertDialog.Builder(MainActivity.this).setTitle("Искомых поездов нет")
-                .setMessage("На выбраную дату поездов искомого типа нет,\n" +
-                        "но есть поезда других типов\n" +
-                        "выберите дальнейшие действия:")
+        AlertDialog dialog = new AlertDialog.Builder(MainActivity.this).setTitle(getString(R.string.no_trains_head))
+                .setMessage(getString(R.string.no_trains_body))
                 .setCancelable(false)
-                .setNegativeButton("Найти ближайшую \n дату с доступными поездами \n искомого типа",
+                .setNegativeButton(getString(R.string.no_trains_find_nearest),
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
                                 findNearestTrainsWithPlaces();
                                 dialog.cancel();
                             }
                         })
-                .setPositiveButton("Показать доступные\nпоезда на выбраную дату", new DialogInterface.OnClickListener() {
+                .setPositiveButton(getString(R.string.no_trains_show_available), new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         Intent intent = new Intent(MainActivity.this, TrainListActivity.class);
                         intent.putExtra("trains", foundData);
@@ -487,7 +543,7 @@ public class MainActivity extends Activity {
                         dialog.cancel();
                     }
                 })
-                .setNeutralButton("Изменить поиск", new DialogInterface.OnClickListener() {
+                .setNeutralButton(getString(R.string.modify_search), new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         dialog.cancel();
                     }
@@ -505,19 +561,17 @@ public class MainActivity extends Activity {
     }
 
     private void showPlacesOptionsMessage() {
-        AlertDialog dialog = new AlertDialog.Builder(MainActivity.this).setTitle("Искомых мест нет")
-                .setMessage("На выбраную дату мест искомого типа нет,\n" +
-                        "но есть места других типов\n" +
-                        "выберите дальнейшие действия:")
+        AlertDialog dialog = new AlertDialog.Builder(MainActivity.this).setTitle(getString(R.string.no_places_head))
+                .setMessage(getString(R.string.no_places_body))
                 .setCancelable(false)
-                .setNegativeButton("Найти ближайшую \n дату с доступными местами \n искомого типа",
+                .setNegativeButton(getString(R.string.no_places_find_nearest),
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
                                 findNearestTrainsWithPlaces();
                                 dialog.cancel();
                             }
                         })
-                .setPositiveButton("Показать доступные\nместа на выбраную дату", new DialogInterface.OnClickListener() {
+                .setPositiveButton(getString(R.string.no_places_show_available), new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         Intent intent = new Intent(MainActivity.this, TrainListActivity.class);
                         intent.putExtra("trains", foundData);
@@ -525,7 +579,7 @@ public class MainActivity extends Activity {
                         dialog.cancel();
                     }
                 })
-                .setNeutralButton("Изменить поиск", new DialogInterface.OnClickListener() {
+                .setNeutralButton(getString(R.string.modify_search), new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         dialog.cancel();
                     }
@@ -543,25 +597,24 @@ public class MainActivity extends Activity {
     }
 
     private void showTrainSearchOptionsMessage() {
-        AlertDialog dialog = new AlertDialog.Builder(MainActivity.this).setTitle("Мест нет")
-                .setMessage("На выбраную дату мест нет,\n" +
-                        "выберите дальнейшие действия:")
+        AlertDialog dialog = new AlertDialog.Builder(MainActivity.this).setTitle(getString(R.string.no_avail_trains_head))
+                .setMessage(getString(R.string.no_avail_trains_body))
                 .setCancelable(true)
-                .setNegativeButton("Найти ближайшую\nдату с доступными местами",
+                .setNegativeButton(getString(R.string.no_avail_trains_find_nearest),
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
                                 findNearestTrainsWithPlaces();
                                 dialog.cancel();
                             }
                         })
-                .setPositiveButton("Включить монитор и\nждать появления\nдоступных мест на\nвыбраную дату",
+                .setPositiveButton(getString(R.string.no_avail_trains_enable_monitor),
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
                                 activateMonitor();
                                 dialog.cancel();
                             }
                         })
-                .setNeutralButton("Изменить поиск", new DialogInterface.OnClickListener() {
+                .setNeutralButton(getString(R.string.modify_search), new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         dialog.cancel();
                     }
@@ -580,26 +633,26 @@ public class MainActivity extends Activity {
 
     private ArrayList<String> initTrainTypes() {
         ArrayList<String> trainTypesLoc = new ArrayList<>();
-        trainTypesLoc.add("Все");
-        trainTypesLoc.add("Обычный");
-        trainTypesLoc.add("Интерсити");
+        trainTypesLoc.add(getString(R.string.all));
+        trainTypesLoc.add(getString(R.string.train_usual));
+        trainTypesLoc.add(getString(R.string.train_ic));
         return trainTypesLoc;
     }
 
     private ArrayList<String> initICCarTypes() {
         ArrayList<String> ICCarTypes = new ArrayList<>();
-        ICCarTypes.add("Все");
-        ICCarTypes.add("С1");
-        ICCarTypes.add("С2");
+        ICCarTypes.add(getString(R.string.all));
+        ICCarTypes.add(getString(R.string.ic_class1));
+        ICCarTypes.add(getString(R.string.ic_class2));
         return ICCarTypes;
     }
 
     private ArrayList<String> initUsualCarTypes() {
         ArrayList<String> usualCarTypes = new ArrayList<>();
-        usualCarTypes.add("Все");
-        usualCarTypes.add("Плацкарт");
-        usualCarTypes.add("Купе");
-        usualCarTypes.add("Люкс");
+        usualCarTypes.add(getString(R.string.all));
+        usualCarTypes.add(getString(R.string.train_class3));
+        usualCarTypes.add(getString(R.string.train_class2));
+        usualCarTypes.add(getString(R.string.train_class1));
         return usualCarTypes;
     }
 
@@ -669,6 +722,84 @@ public class MainActivity extends Activity {
     }
 
     private void activateMonitor() {
+        Dialog dialog = new Dialog(this);
+        dialog.setTitle(getString(R.string.monitor_settings_head));
+
+        Intent intent = new Intent(this, TicketFinderService.class);
+        SimpleDateFormat sdf = new SimpleDateFormat("MMMM dd yyyy", Locale.US);
+
+        dialog.setContentView(R.layout.monitor_settings_layout);
+        RadioButton rbNoAct = (RadioButton) dialog.findViewById(R.id.rbNoAction);
+        RadioButton rbBlock1 = (RadioButton) dialog.findViewById(R.id.rbBlockOnce);
+        RadioButton rbBlockCont = (RadioButton) dialog.findViewById(R.id.rbBlockContinuous);
+        RadioButton rbNotifStatBar = (RadioButton) dialog.findViewById(R.id.rbStatusBarNotification);
+        RadioButton rbNotifShort = (RadioButton) dialog.findViewById(R.id.rbShortNotification);
+        RadioButton rbNotifLong = (RadioButton) dialog.findViewById(R.id.rbLongNotification);
+        Button start = (Button) dialog.findViewById(R.id.btnStartMon);
+
+        rbNoAct.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked)
+                    action = "no";
+            }
+        });
+        rbBlock1.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked)
+                    action = "1";
+            }
+        });
+        rbBlockCont.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked)
+                    action = "cont";
+            }
+        });
+
+        rbNotifStatBar.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked)
+                    notification = "statbar";
+            }
+        });
+        rbNotifShort.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked)
+                    notification = "short";
+            }
+        });
+        rbNotifLong.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked)
+                    notification = "long";
+            }
+        });
+
+        start.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                intent.putExtra("stationFromId", stationFromId);
+                intent.putExtra("stationToId", stationToId);
+                intent.putExtra("date", sdf.format(date.getTime()));
+                intent.putExtra("action", action);
+                intent.putExtra("notification", notification);
+                intent.putExtra("ticketType", ticketType);
+                intent.putExtra("buy", isBuying);
+                intent.putExtra("name", name);
+                intent.putExtra("surname", surname);
+                startService(intent);
+                dialog.hide();
+            }
+        });
+
+        dialog.show();
+
 
     }
 

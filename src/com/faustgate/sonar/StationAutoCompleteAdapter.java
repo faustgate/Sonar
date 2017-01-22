@@ -1,4 +1,4 @@
-package com.faustgate.ukrzaliznitsya;
+package com.faustgate.sonar;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -22,10 +22,11 @@ class StationAutoCompleteAdapter extends BaseAdapter implements Filterable {
     private List<String> mResults;
     private ArrayList<String> names = new ArrayList<>();
     private List<HashMap<String, String>> stations = new ArrayList<>();
-    private UZRequests uzr = UZRequests.getInstance();
+    private UZRequests uzr;
 
     StationAutoCompleteAdapter(Context context) {
         mContext = context;
+        uzr = UZRequests.getInstance(mContext);
         mResults = new ArrayList<>();
     }
 
@@ -44,7 +45,7 @@ class StationAutoCompleteAdapter extends BaseAdapter implements Filterable {
         return position;
     }
 
-    public void clear() {
+    void clear() {
         stations.clear();
         mResults.clear();
         names.clear();
@@ -57,25 +58,22 @@ class StationAutoCompleteAdapter extends BaseAdapter implements Filterable {
             LayoutInflater inflater = LayoutInflater.from(mContext);
             convertView = inflater.inflate(R.layout.item_station, parent, false);
         }
-        //String book = getItem(position);
         ((TextView) convertView.findViewById(R.id.text1)).setText(names.get(position));
-        //((TextView) convertView.findViewById(R.id.text2)).setText(ids.get(position));
-
         return convertView;
     }
 
     @Override
     public Filter getFilter() {
-        Filter filter = new Filter() {
+        return new Filter() {
             @Override
             protected FilterResults performFiltering(CharSequence constraint) {
                 FilterResults filterResults = new FilterResults();
                 if (constraint != null) {
                     stations = findStations(constraint.toString());
+                    assert stations != null;
                     for (HashMap<String, String> station : stations) {
                         names.add(station.get("title"));
                     }
-                    // Assign the data to the FilterResults
                     filterResults.values = names;
                     filterResults.count = names.size();
                 }
@@ -92,8 +90,6 @@ class StationAutoCompleteAdapter extends BaseAdapter implements Filterable {
                 }
             }
         };
-
-        return filter;
     }
 
     /**
@@ -105,7 +101,7 @@ class StationAutoCompleteAdapter extends BaseAdapter implements Filterable {
         try {
             stations = uzr.getStationsInfo(stationName);
             if (stations.size() == 0) {
-                Toast da = Toast.makeText(mContext, "No stations were found by given criteria", Toast.LENGTH_SHORT);
+                Toast da = Toast.makeText(mContext, mContext.getString(R.string.no_stations_found), Toast.LENGTH_SHORT);
                 da.show();
             }
             return stations;

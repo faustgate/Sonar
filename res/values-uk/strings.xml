@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Сонар</string>
+    <string name="cart_address">/mobile/cart/</string>
+    <string name="user_date_format">EEEE, dd MMMM, yyyy</string>
+    <string name="all">Усі</string>
+    <string name="ic_class1">С1</string>
+    <string name="ic_class2">C2</string>
+    <string name="base_url">http://booking.uz.gov.ua/</string>
+    <string name="date_format">dd.MM.yyyy</string>
+    <string name="arr">Приб.</string>
+    <string name="dep">Відпр.:</string>
+    <string name="train_class1">Люкс</string>
+    <string name="train_class2">Купе</string>
+    <string name="train_class3">Плацкарт</string>
+    <string name="train_ic">Интерсіті</string>
+    <string name="train_usual">Звичайний</string>
+</resources>

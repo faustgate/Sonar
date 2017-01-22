@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_height="60dp"
+    android:layout_width="match_parent">
+
+    <TextView
+        android:text="113Ш"
+        android:layout_height="match_parent"
+        android:layout_width="wrap_content"
+        android:gravity="center"
+        android:id="@+id/train_num" />
+
+    <LinearLayout
+        android:layout_weight="1"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_weight="1"
+            android:layout_height="match_parent"
+            android:layout_width="match_parent"
+            android:text="Одесса - Киев"
+            android:paddingTop="5dp"
+            android:id="@+id/train_direction"
+            android:gravity="center" />
+
+        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            android:orientation="horizontal"
+            android:layout_height="match_parent"
+            android:layout_width="match_parent"
+            android:layout_weight="1"
+            android:paddingBottom="5dp">
+
+            <TextView
+                android:layout_height="match_parent"
+                android:layout_width="match_parent"
+                android:text="Отпр.: "
+                android:gravity="center"
+                android:layout_weight="1"
+                android:id="@+id/train_dep_date_header" />
+
+            <TextView
+                android:layout_weight="0.9"
+                android:layout_height="match_parent"
+                android:layout_width="fill_parent"
+                android:text="13.13.2013"
+                android:gravity="center|start"
+                android:id="@+id/train_dep_date_field" />
+
+            <TextView
+                android:layout_weight="1"
+                android:layout_height="match_parent"
+                android:layout_width="match_parent"
+                android:text="Приб."
+                android:gravity="center"
+                android:id="@+id/train_arr_date_header" />
+
+            <TextView
+                android:layout_weight="0.9"
+                android:layout_height="match_parent"
+                android:layout_width="match_parent"
+                android:text="11.11.2016"
+                android:id="@+id/train_arr_date_field"
+                android:gravity="center|start" />
+
+
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_height="match_parent"
+        android:layout_width="wrap_content"
+        android:id="@+id/places_placeholder">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:layout_weight="1">
+
+            <TextView
+                android:text="СВ:  "
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:gravity="left|center|right"
+                android:id="@+id/places_1_header" />
+
+            <TextView
+                android:text="23"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:gravity="center"
+                android:id="@+id/places_1_field" />
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:gravity="center"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:layout_weight="1">
+
+            <TextView
+                android:text="П:"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:gravity="center|right"
+                android:id="@+id/places_3_header" />
+
+            <TextView
+                android:text="33"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:gravity="center"
+                android:id="@+id/places_3_field" />
+        </LinearLayout>
+
+    </LinearLayout>
+</LinearLayout>
