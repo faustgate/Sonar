@@ -98,14 +98,13 @@ class UZRequests {
 
         List<HashMap<String, String>> stations = new ArrayList<>();
         try {
-            res = new GetUZData().execute(mContext.getString(R.string.base_url) + "/purchase/station/" + first_letters).get();
-            dataJsonObj = new JSONObject(res);
-            JSONArray stt = dataJsonObj.getJSONArray("value");
+            res = new GetUZData().execute(mContext.getString(R.string.base_url) + "/purchase/station/?term=" + first_letters).get();
+            JSONArray stt = new JSONArray(res);
             for (int i = 0; i < stt.length(); i++) {
                 HashMap<String, String> station = new HashMap<>();
                 JSONObject sttt = stt.getJSONObject(i);
-                station.put("title", sttt.getString("title"));
-                station.put("station_id", sttt.getString("station_id"));
+                station.put("title", sttt.getString("label"));
+                station.put("station_id", sttt.getString("value"));
                 stations.add(station);
             }
         } catch (JSONException | InterruptedException | ExecutionException e) {
@@ -155,12 +154,15 @@ class UZRequests {
             for (int i = 0; i < car_types.length(); i++) {
                 if (formData.containsKey("coach_type"))
                     formData.remove("coach_type");
-                String placeId = trainInfo.getJSONArray("types").getJSONObject(i).getString("letter");
+                String placeId = trainInfo.getJSONArray("types").getJSONObject(i).getString("id");
                 formData.put("coach_type", placeId);
 
                 res = new GetUZData().execute(mContext.getString(R.string.base_url) + "/purchase/coaches/").get();
 
                 JSONObject coachesInfo = new JSONObject(res.toString());
+
+                coachesInfo.remove("content");
+
                 JSONArray availableCars = coachesInfo.getJSONArray("coaches");
                 for (int j = 0; j < availableCars.length(); j++) {
                     JSONObject currentCoachInfo = availableCars.getJSONObject(j);

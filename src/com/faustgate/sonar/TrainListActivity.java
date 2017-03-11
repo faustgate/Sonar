@@ -53,7 +53,7 @@ public class TrainListActivity extends Activity {
                     Toast.makeText(getApplicationContext(), data, Toast.LENGTH_LONG).show();
                     String curTrain = trains.getJSONObject(position).toString();
 
-                    Intent intent = new Intent(TrainListActivity.this, PlacesActivity.class);
+                    Intent intent = new Intent(TrainListActivity.this, CoachListActivity.class);
                     intent.putExtra("train", curTrain);
                     intent.putExtra("name", name);
                     intent.putExtra("surname", surname);

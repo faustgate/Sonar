@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+             android:orientation="vertical"
+             android:layout_width="match_parent"
+             android:layout_height="match_parent">
+
+    <FrameLayout>
+
+        <FrameLayout
+            android:orientation="vertical"
+            android:layout_height="wrap_content"
+            android:layout_width="160dp">
+
+            <com.faustgate.ukrzaliznitsya.DelayAutoCompleteTextView
+                android:id="@+id/stationFrom"
+                android:inputType="textCapSentences|textFilter"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:imeOptions="flagNoExtractUi"
+                android:completionThreshold="2"
+                android:hint="@string/from"
+                android:singleLine="true"
+                android:digits="АБВГҐДЕЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯабвгґдеёєжзиіїйклмнопрстуфхцчшщъыьэюяABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890-"
+                android:layout_gravity="center_vertical"/>
+
+            <ProgressBar
+                android:id="@+id/progress_bar"
+                style="?android:attr/progressBarStyleSmall"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical|end"
+                android:visibility="invisible"
+                android:layout_marginRight="-5dp"/>
+        </FrameLayout>
+
+        <FrameLayout
+            android:orientation="vertical"
+            android:layout_height="wrap_content"
+            android:layout_width="160dp"
+            android:layout_gravity="center_vertical|end">
+
+            <com.faustgate.ukrzaliznitsya.DelayAutoCompleteTextView
+                android:id="@+id/stationTo"
+                android:layout_width="160dp"
+                android:layout_height="wrap_content"
+                android:imeOptions="flagNoExtractUi"
+                android:completionThreshold="2"
+                android:hint="@string/to"
+                android:singleLine="true"
+                android:digits="АБВГҐДЕЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯабвгґдеёєжзиіїйклмнопрстуфхцчшщъыьэюяABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890-"
+                android:inputType="textCapSentences|textFilter"
+                />
+
+            <ProgressBar
+                android:id="@+id/progress_bar2"
+                style="?android:attr/progressBarStyleSmall"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:visibility="invisible"
+                android:layout_gravity="center_vertical|end"
+                android:layout_marginRight="-5dp"/>
+        </FrameLayout>
+
+
+    </FrameLayout>
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/dateEditText"
+        android:layout_gravity="center_horizontal"/>
+
+    <FrameLayout
+        android:orientation="vertical"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        >
+
+        <EditText
+            android:layout_width="160dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/nameEditText"
+            android:hint="@string/name"
+            android:inputType="textCapSentences"/>
+
+        <EditText
+            android:layout_width="160dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/surnameEditText"
+            android:hint="@string/surname"
+            android:inputType="textCapSentences"
+            android:layout_gravity="end|center_vertical"/>
+    </FrameLayout>
+
+    <TableRow
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:text="@string/train_type"
+            android:id="@+id/textView"
+            android:layout_gravity="center_vertical|end"/>
+
+
+        <Spinner
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/trainTypeSpinner"
+            android:layout_weight="0.1"
+            />
+    </TableRow>
+
+    <TableRow>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:text="@string/place_type"
+            android:id="@+id/textView2"
+            android:layout_gravity="center_vertical|end"/>
+
+
+        <Spinner
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/carTypeSpinner"
+            android:layout_weight="0.1"/>
+    </TableRow>
+
+    <TableRow>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:text="@string/operation"
+            android:id="@+id/textView3"
+            android:layout_gravity="center_vertical|end"/>
+
+
+        <Spinner
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/buySpinner"
+            android:layout_weight="0.1"
+            />
+    </TableRow>
+
+    <TableRow>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:text="@string/ticket_type"
+            android:id="@+id/textView4"
+            android:layout_gravity="center_vertical|end"/>
+
+
+        <Spinner
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/ticketTypeSpinner"
+            android:layout_weight="0.1"/>
+    </TableRow>
+
+    <TableRow>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:text="@string/ticket_amount"
+            android:id="@+id/textView7"
+            android:layout_gravity="center_vertical|end"
+            android:visibility="gone"/>
+
+
+        <Spinner
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/ticketAmountPicker"
+            android:layout_weight="0.1"
+            android:visibility="gone"/>
+    </TableRow>
+
+    <CheckBox
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="New CheckBox"
+        android:id="@+id/checkBox3"
+        android:visibility="gone"/>
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/search"
+        android:id="@+id/button"/>
+
+</TableLayout>
