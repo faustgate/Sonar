@@ -1,4 +1,4 @@
-package com.faustgate.ukrzaliznitsya;
+package com.faustgate.sonar;
 
 //
 // Java version of Python version of the jjdecode function written by Syed Zainudeen

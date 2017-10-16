@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="horizontal"
+              android:layout_height="wrap_content"
+              android:layout_width="match_parent"
+              android:paddingRight="10dp">
+
+    <TextView
+        android:text="1"
+        android:layout_height="match_parent"
+        android:layout_width="30dp"
+        android:gravity="center"
+        android:id="@+id/car_num"/>
+
+    <LinearLayout
+        android:layout_weight="1"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:text="@string/train_type"
+            android:id="@+id/car_type"
+            android:gravity="left"/>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:layout_weight="1">
+
+            <TextView
+                android:layout_weight="1"
+                android:layout_height="17dp"
+                android:layout_width="0dp"
+                android:text="@string/place_count_header"
+                android:id="@+id/place_num_head"
+                android:gravity="left"/>
+
+            <TextView
+                android:text="26"
+                android:layout_height="match_parent"
+                android:layout_width="match_parent"
+                android:gravity="left"
+                android:id="@+id/place_num_placeholder"/>
+
+
+        </LinearLayout>
+    </LinearLayout>
+
+
+    <!--<LinearLayout-->
+    <!--android:layout_weight=".5"-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="match_parent"-->
+    <!--android:orientation="vertical">-->
+
+    <!--<TextView-->
+    <!--android:layout_height="match_parent"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:gravity="center"-->
+    <!--android:text="Сервисы:"-->
+    <!--android:id="@+id/additional_info_header"/>-->
+    <!--</LinearLayout>-->
+
+
+    <TextView
+        android:layout_height="match_parent"
+        android:layout_width="wrap_content"
+        android:id="@+id/price_placeholder"
+        android:text="70294"
+        android:gravity="center">
+    </TextView>
+</LinearLayout>

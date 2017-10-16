@@ -1,4 +1,4 @@
-package com.faustgate.ukrzaliznitsya;
+package com.faustgate.sonar;
 
 import android.content.Context;
 import android.os.Handler;
@@ -47,7 +47,7 @@ public class DelayAutoCompleteTextView extends AutoCompleteTextView {
     @Override
     public void onFilterComplete(int count) {
         if (mLoadingIndicator != null) {
-            mLoadingIndicator.setVisibility(View.GONE);
+            mLoadingIndicator.setVisibility(View.INVISIBLE);
         }
         super.onFilterComplete(count);
     }

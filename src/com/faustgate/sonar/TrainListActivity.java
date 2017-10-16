@@ -1,4 +1,4 @@
-package com.faustgate.ukrzaliznitsya;
+package com.faustgate.sonar;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -13,9 +13,6 @@ import org.json.JSONObject;
 
 import java.text.MessageFormat;
 
-/**
- * Created by sergey.puronen on 10/12/16.
- */
 public class TrainListActivity extends Activity {
     private JSONObject obj = null;
     private JSONArray trains = null;
@@ -24,13 +21,21 @@ public class TrainListActivity extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        SoundNotifier.getInstance(getApplicationContext()).stopSound();
+        Intent intent1 = new Intent(this, TicketFinderService.class);
+        stopService(intent1);
+
         Intent intent = getIntent();
         String trainsData = intent.getStringExtra("trains");
+        String name = intent.getStringExtra("name");
+        String surname = intent.getStringExtra("surname");
 
         try {
-            obj = new JSONObject(trainsData);
-            trains = obj.getJSONArray("value");
+            trains = new JSONArray(trainsData);
         } catch (JSONException e) {
+            e.printStackTrace();
+            return;
+        } catch (NullPointerException e) {
             e.printStackTrace();
         }
 
@@ -48,8 +53,11 @@ public class TrainListActivity extends Activity {
                     Toast.makeText(getApplicationContext(), data, Toast.LENGTH_LONG).show();
                     String curTrain = trains.getJSONObject(position).toString();
 
-                    Intent intent = new Intent(TrainListActivity.this, PlacesActivity.class);
+                    Intent intent = new Intent(TrainListActivity.this, CoachListActivity.class);
                     intent.putExtra("train", curTrain);
+                    intent.putExtra("name", name);
+                    intent.putExtra("surname", surname);
+
                     startActivity(intent);
 
                 } catch (JSONException e) {
