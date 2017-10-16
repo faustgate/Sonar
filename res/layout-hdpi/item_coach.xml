@@ -15,7 +15,7 @@
 
     <LinearLayout
         android:layout_weight="1"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:orientation="vertical">
 
@@ -23,28 +23,52 @@
             android:layout_weight="1"
             android:layout_height="wrap_content"
             android:layout_width="match_parent"
-            android:text="Одесса - Киев"
+            android:text="@string/train_type"
             android:id="@+id/car_type"
-            android:gravity="center"/>
+            android:gravity="left"/>
 
-        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                      android:orientation="horizontal"
-                      android:layout_height="wrap_content"
-                      android:layout_width="match_parent"
-                      android:layout_weight="1">
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:layout_weight="1">
 
             <TextView
                 android:layout_weight="1"
                 android:layout_height="17dp"
                 android:layout_width="0dp"
-                android:text="Сервисы:"
-                android:id="@+id/additional_info_header"
+                android:text="@string/place_count_header"
+                android:id="@+id/place_num_head"
                 android:gravity="left"/>
+
+            <TextView
+                android:text="26"
+                android:layout_height="match_parent"
+                android:layout_width="match_parent"
+                android:gravity="left"
+                android:id="@+id/place_num_placeholder"/>
+
+
         </LinearLayout>
     </LinearLayout>
 
+
+    <!--<LinearLayout-->
+    <!--android:layout_weight=".5"-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="match_parent"-->
+    <!--android:orientation="vertical">-->
+
+    <!--<TextView-->
+    <!--android:layout_height="match_parent"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:gravity="center"-->
+    <!--android:text="Сервисы:"-->
+    <!--android:id="@+id/additional_info_header"/>-->
+    <!--</LinearLayout>-->
+
+
     <TextView
-        android:orientation="vertical"
         android:layout_height="match_parent"
         android:layout_width="wrap_content"
         android:id="@+id/price_placeholder"

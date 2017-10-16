@@ -10,12 +10,12 @@ import android.widget.TextView;
 import java.util.HashMap;
 import java.util.List;
 
-class CoachListAdapter extends BaseAdapter {
+class PlaceListAdapter extends BaseAdapter {
 
     private final Context mContext;
     private List<HashMap<String, String>> mObjects;
 
-    CoachListAdapter(Context context, List<HashMap<String, String>> values) {
+    PlaceListAdapter(Context context, List<HashMap<String, String>> values) {
         mContext = context;
         mObjects = values;
     }
@@ -39,12 +39,11 @@ class CoachListAdapter extends BaseAdapter {
     public View getView(int position, View convertView, ViewGroup parent) {
         if (convertView == null) {
             LayoutInflater inflater = LayoutInflater.from(mContext);
-            convertView = inflater.inflate(R.layout.item_coach, parent, false);
+            convertView = inflater.inflate(R.layout.item_place, parent, false);
         }
         HashMap<String, String> car = mObjects.get(position);
-        String number = car.get("number");
+        String number = car.get("train_num");
         String carClassName = car.get("carClassName");
-        String placeCount = car.get("places_count");
         double price = 0;
         try {
             price = Integer.parseInt(car.get("price")) / 100.0;
@@ -53,10 +52,9 @@ class CoachListAdapter extends BaseAdapter {
         }
         String new_price = String.valueOf(price);
 
-        ((TextView) convertView.findViewById(R.id.car_num)).setText(number);
+        ((TextView) convertView.findViewById(R.id.train_placeholder)).setText(number);
         ((TextView) convertView.findViewById(R.id.price_placeholder)).setText(new_price);
-        ((TextView) convertView.findViewById(R.id.car_type)).setText(carClassName);
-        ((TextView) convertView.findViewById(R.id.place_num_placeholder)).setText(placeCount);
+       // ((TextView) convertView.findViewById(R.id.car_type)).setText(carClassName);
 
         return convertView;
     }

@@ -181,7 +181,7 @@ public class PlacesActivity extends Activity {
                     currentTicketDescription.put("reserve", "0");
 
                     placesDescription.add(currentTicketDescription);
-                    String ticketsData = UZRequests.getInstance().buyTickets(curTrain, placesDescription);
+                    String ticketsData = UZRequests.getInstance().buyTickets(placesDescription);
                     placesDescription.clear();
                     Intent intent = new Intent(PlacesActivity.this, BuyTicketActivity.class);
                     startActivity(intent);

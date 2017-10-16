@@ -16,9 +16,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-/**
- * Created by werwolf on 11/19/16.
- */
+
 public class TicketFinderService extends Service {
     private String stationFromId = "";
     private String stationToId = "";
@@ -29,7 +27,6 @@ public class TicketFinderService extends Service {
     private String surname = "";
     private boolean isBuying;
     private ArrayList<HashMap<String, String>> placesDescription = new ArrayList<>();
-    private JSONObject curTrain;
     private String place_num = "";
 
 
@@ -169,7 +166,7 @@ public class TicketFinderService extends Service {
         HashMap<String, String> currentTicketDescription;
         try {
             if (placesDescription.size() == 0) {
-                curTrain = new JSONArray(foundData).getJSONObject(0);
+                JSONObject curTrain = new JSONArray(foundData).getJSONObject(0);
 
                 List<JSONObject> ticketsData = UZRequests.getInstance().searchForTickets(curTrain);
 
@@ -217,7 +214,7 @@ public class TicketFinderService extends Service {
                 Thread.sleep(10000);
 
             }
-            UZRequests.getInstance().buyTickets(curTrain, placesDescription);
+            UZRequests.getInstance().buyTickets(placesDescription);
         } catch (InterruptedException | JSONException e) {
             e.printStackTrace();
         }

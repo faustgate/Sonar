@@ -8,9 +8,6 @@ import android.webkit.CookieSyncManager;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
-/**
- * Created by sergey.puronen on 10/31/16.
- */
 public class BuyTicketActivity extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -21,6 +18,13 @@ public class BuyTicketActivity extends Activity {
         SoundNotifier.getInstance(getApplicationContext()).stopSound();
 
         String sesCookie = UZRequests.getInstance().getAuthCookie();
+
+        String[] cookies = sesCookie.split(";");
+        for (String cookie : cookies) {
+            if (cookie.replace(" ", "").startsWith("_gv_sessid")) {
+                sesCookie = cookie.replace(" ", "");
+            }
+        }
 
         setContentView(R.layout.buy_ticket_layout);
 

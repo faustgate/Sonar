@@ -26,10 +26,6 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 
-/**
- * Created by werwolf on 8/6/16.
- */
-
 class UZRequests {
     private static UZRequests mInstance = null;
     private Context mContext = null;
@@ -39,24 +35,21 @@ class UZRequests {
     private Header[] cookies = new Header[]{};
     private List<String> ticketFields = Arrays.asList("ord", "charline", "wagon_num", "wagon_class", "wagon_type", "firstname", "lastname", "bedding", "child", "stud", "transportation", "reserve", "place_num");
     private List<String> formFields = Arrays.asList("from", "to", "train", "date", "round_trip");
-    private boolean isAuthDataPresent = false;
-    private String auth_token;
-    private String reservationId;
+    private List<JSONObject> lastPlacesInfo = new ArrayList<>();
+  //  private JSONObject lastTr = new ArrayList<>();
+    private String auth_token, reservationId, lastFromStationId, lastTillStationId, lastDepDate,lastTrainsInfo, lastTrainId;
     private ArrayList<HashMap<String, String>> ticketsDescriptions;
+    private boolean isAuthDataPresent = false;
     private boolean isBuying = false;
     private boolean refreshTokens = true;
-    private Date dateDep;
-    private String rem_head = "<script>var em = $v.rot13(GV.site.email_support);" +
-            "$$v('#contactEmail').attach({ href: 'mailto:' + em, innerHTML: em});" +
-            "$v.domReady(function () {Common.performModule();Common.pageInformation();" +
-            "Common.setOpacHover($$v('#footer .cards_ribbon a, #footer .left a'), 50);" +
-            "Common.setOpacHover($$v('#footer .right a'), 70);});";
-    private String rem_foot = "(function () {var ga = document.createElement('script');" +
-            "ga.async = true;" +
-            "ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + " +
-            "'.google-analytics.com/ga.js';" +
-            "var s = document.getElementsByTagName('script')[0];s.parentNode.insertBefore(ga, s);})();";
+    private boolean ticketsFound = false;
+    private JSONObject lastTrainInfo;
 
+
+
+    private String currentDepDate, currentStationTillId, currentStationFromId;
+    private Date dateDep;
+    List<String> tmp = new ArrayList<>();
 
     private UZRequests() {
         headers.put("Referer", "http://booking.uz.gov.ua");
@@ -103,7 +96,7 @@ class UZRequests {
             for (int i = 0; i < stt.length(); i++) {
                 HashMap<String, String> station = new HashMap<>();
                 JSONObject sttt = stt.getJSONObject(i);
-                station.put("title", sttt.getString("label"));
+                station.put("title", sttt.getString("title"));
                 station.put("station_id", sttt.getString("value"));
                 stations.add(station);
             }
@@ -115,21 +108,28 @@ class UZRequests {
 
     String searchForTrains(String station_from_id, String station_to_id, Date date) {
         initFormData();
-        dateDep = date;
-        formData.put("station_id_from", station_from_id);
-        formData.put("station_id_till", station_to_id);
-        formData.put("date_dep", new SimpleDateFormat(mContext.getString(R.string.date_format)).format(dateDep.getTime()));
-        formData.put("time_dep", "00:00");
-        formData.put("time_dep_till", "");
-        formData.put("another_ec", "0");
-        String result = "";
-        try {
-            Object res = new GetUZData().execute(mContext.getString(R.string.base_url) + "/purchase/search/").get();
-            result = StringEscapeUtils.unescapeJava(res.toString());
-        } catch (InterruptedException | ExecutionException e) {
-            e.printStackTrace();
+
+        String strDateDep = new SimpleDateFormat(mContext.getString(R.string.date_format)).format(date.getTime());
+
+        if (!station_from_id.equals(lastFromStationId) || !station_to_id.equals(lastTillStationId) || !strDateDep.equals(lastDepDate)) {
+            dateDep = date;
+            formData.put("station_id_from", station_from_id);
+            formData.put("station_id_till", station_to_id);
+            formData.put("date_dep", strDateDep);
+            formData.put("time_dep", "00:00");
+            formData.put("time_dep_till", "");
+            formData.put("another_ec", "0");
+            try {
+                Object res = new GetUZData().execute(mContext.getString(R.string.base_url) + "/purchase/search/").get();
+                lastTrainsInfo = StringEscapeUtils.unescapeJava(res.toString());
+            } catch (InterruptedException | ExecutionException e) {
+                e.printStackTrace();
+            }
+            lastDepDate = strDateDep;
+            lastFromStationId = station_from_id;
+            lastTillStationId = station_to_id;
         }
-        return result;
+        return lastTrainsInfo;
     }
 
     List<JSONObject> searchForTickets(JSONObject trainInfo) {
@@ -139,70 +139,74 @@ class UZRequests {
 
         try {
             String trainId = trainInfo.getString("num");
-            String fromStationId = trainInfo.getJSONObject("from").getString("station_id");
-            String toStationId = trainInfo.getJSONObject("till").getString("station_id");
-            String date = trainInfo.getJSONObject("from").getString("date");
+            String date    = trainInfo.getJSONObject("from").getString("date");
 
-            JSONArray car_types = trainInfo.getJSONArray("types");
-            initFormData();
-            formData.put("station_id_from", fromStationId);
-            formData.put("station_id_till", toStationId);
-            formData.put("date_dep", date);
-            formData.put("train", trainId);
-            formData.put("another_ec", "0");
+            lastTrainInfo = trainInfo;
 
-            for (int i = 0; i < car_types.length(); i++) {
-                if (formData.containsKey("coach_type"))
-                    formData.remove("coach_type");
-                String placeId = trainInfo.getJSONArray("types").getJSONObject(i).getString("id");
-                formData.put("coach_type", placeId);
+            if ((!currentStationFromId.equals(lastFromStationId) || !currentStationTillId.equals(lastTillStationId) ||
+                    !date.equals(lastDepDate) || !trainId.equals(lastTrainId))) {
 
-                res = new GetUZData().execute(mContext.getString(R.string.base_url) + "/purchase/coaches/").get();
 
-                JSONObject coachesInfo = new JSONObject(res.toString());
+                JSONArray car_types = trainInfo.getJSONArray("types");
+                initFormData();
+                formData.put("station_id_from", currentStationFromId);
+                formData.put("station_id_till", currentStationTillId);
+                formData.put("date_dep", date);
+                formData.put("train", trainId);
+                formData.put("another_ec", "0");
 
-                coachesInfo.remove("content");
+                for (int i = 0; i < car_types.length(); i++) {
+                    if (formData.containsKey("coach_type"))
+                        formData.remove("coach_type");
+                    String placeId = trainInfo.getJSONArray("types").getJSONObject(i).getString("id");
+                    formData.put("coach_type", placeId);
 
-                JSONArray availableCars = coachesInfo.getJSONArray("coaches");
-                for (int j = 0; j < availableCars.length(); j++) {
-                    JSONObject currentCoachInfo = availableCars.getJSONObject(j);
-                    String coachNum = currentCoachInfo.getString("num");
-                    String coachClass = currentCoachInfo.getString("coach_class");
-                    String coachTypeId = currentCoachInfo.getString("coach_type_id");
-                    if (formData.containsKey("coach_num"))
-                        formData.remove("coach_num");
-                    if (formData.containsKey("coach_class"))
-                        formData.remove("coach_class");
-                    if (formData.containsKey("coach_type_id"))
-                        formData.remove("coach_type_id");
-                    formData.put("coach_num", coachNum);
-                    formData.put("coach_class", coachClass);
-                    formData.put("coach_type_id", coachTypeId);
-                    res = new GetUZData().execute(mContext.getString(R.string.base_url) + "/purchase/coach/").get();
-                    JSONObject coachInfo = new JSONObject(res.toString());
-                    JSONObject placesList = coachInfo.getJSONObject("value");
-                    availableCars.getJSONObject(j).put("places_list", placesList);
-                    String sdf = "affas";
+                    res = new GetUZData().execute(mContext.getString(R.string.base_url) + "/purchase/coaches/").get();
 
+                    JSONObject coachesInfo = new JSONObject(res.toString());
+
+                    coachesInfo.remove("content");
+
+                    JSONArray availableCars = coachesInfo.getJSONArray("coaches");
+                    for (int j = 0; j < availableCars.length(); j++) {
+                        JSONObject currentCoachInfo = availableCars.getJSONObject(j);
+                        String coachNum = currentCoachInfo.getString("num");
+                        String coachClass = currentCoachInfo.getString("coach_class");
+                        if (formData.containsKey("coach_num"))
+                            formData.remove("coach_num");
+                        if (formData.containsKey("coach_class"))
+                            formData.remove("coach_class");
+                        formData.put("coach_num", coachNum);
+                        formData.put("coach_class", coachClass);
+                        formData.put("coach_type", placeId);
+                        res = new GetUZData().execute(mContext.getString(R.string.base_url) + "/purchase/coach/").get();
+                        tmp.add(res.toString());
+                        JSONObject coachInfo = new JSONObject(res.toString());
+                        JSONObject placesList = coachInfo.getJSONObject("value");
+                        availableCars.getJSONObject(j).put("places_list", placesList);
+                    }
+
+                    placesInfo.add(coachesInfo);
                 }
 
-                placesInfo.add(coachesInfo);
+                lastPlacesInfo = placesInfo;
+
             }
         } catch (InterruptedException | ExecutionException | JSONException e) {
             e.printStackTrace();
         }
-        return placesInfo;
+        return lastPlacesInfo;
     }
 
-    String buyTickets(JSONObject trainInfo, ArrayList<HashMap<String, String>> ticketDescriptions) {
+    String buyTickets(ArrayList<HashMap<String, String>> ticketDescriptions) {
         String result = null;
         try {
             initFormData();
-            String trainId = trainInfo.getString("num");
-            String fromStationId = trainInfo.getJSONObject("from").getString("station_id");
-            String toStationId = trainInfo.getJSONObject("till").getString("station_id");
-            formData.put("from", fromStationId);
-            formData.put("to", toStationId);
+            String trainId       = lastTrainInfo.getString("num");
+            String stationFromId = lastFromStationId;
+            String stationTillId = lastTillStationId;
+            formData.put("from", stationFromId);
+            formData.put("to",   stationTillId);
             formData.put("date", new SimpleDateFormat("yyyy-MM-dd").format(dateDep));
             formData.put("train", trainId);
             formData.put("round_trip", "0");
@@ -237,16 +241,16 @@ class UZRequests {
 
     private String getAuthData(String page) {
         String token = "";
-        try {
-            String script = page.substring(page.lastIndexOf("<script>"), page.lastIndexOf("</script>"));
-            script = script.replace(rem_head, "");
-            token = new JJDecoder(script).decode().split("\"")[3];
-        } catch (Exception e) {
-            LogSystem.e("UKRZaliznitsya", MessageFormat.format("Error in getAuthData, page is: {}", page));
-            e.printStackTrace();
-            return "";
-        }
-        headers.put("GV-Token", token);
+//        try {
+//            String script = page.substring(page.lastIndexOf("<script>"), page.lastIndexOf("</script>"));
+//            script = script.replace(rem_head, "");
+//            token = new JJDecoder(script).decode().split("\"")[3];
+//        } catch (Exception e) {
+//            LogSystem.e("UKRZaliznitsya", MessageFormat.format("Error in getAuthData, page is: {}", page));
+//            e.printStackTrace();
+//            return "";
+//        }
+        //   headers.put("GV-Token", token);
         headers.put("GV-Ajax", "1");
         String str = "";
         for (Header el : cookies) {
@@ -255,6 +259,7 @@ class UZRequests {
         }
         String cookie = str.replace("Set-Cookie:", "");
         headers.put("Cookie", cookie);
+        LogSystem.i("UKRZaliznitsya", "Cookies \"" + cookie + " \" saved ");
         refreshTokens = false;
         return token;
     }
@@ -291,6 +296,7 @@ class UZRequests {
 
         protected String doInBackground(String... urls) {
             if ((!isAuthDataPresent) || refreshTokens) {
+                LogSystem.i("UKRZaliznitsya", "No cookies saved, renewing...");
                 String page = performRequest(mContext.getString(R.string.base_url));
                 auth_token = getAuthData(page);
                 isAuthDataPresent = true;
@@ -392,8 +398,7 @@ class UZRequests {
 //                Request request = requestBuilder.build();
 //                Response response = client.newCall(request).execute();
 
-                String msg = MessageFormat.format("Request on {0} with params {1}", url_adr,
-                        getStringFromStream(entity.getContent()));
+                String msg = MessageFormat.format("Request on {0} with params {1}", url_adr, getStringFromStream(entity.getContent()));
 
                 LogSystem.i("UKRZaliznitsya", msg);
                 HttpResponse response = client.execute(post);
@@ -414,4 +419,29 @@ class UZRequests {
             return response_string;
         }
     }
+
+    public String getCurrentStationFromId() {
+        return currentStationFromId;
+    }
+
+    public void setCurrentStationFromId(String currentStationFromId) {
+        this.currentStationFromId = currentStationFromId;
+    }
+
+    public String getCurrentStationTillId() {
+        return currentStationTillId;
+    }
+
+    public void setCurrentStationTillId(String currentStationTillId) {
+        this.currentStationTillId = currentStationTillId;
+    }
+
+    public String getCurrentDepDate() {
+        return currentDepDate;
+    }
+
+    public void setCurrentDepDate(String currentDepDate) {
+        this.currentDepDate = currentDepDate;
+    }
+
 }

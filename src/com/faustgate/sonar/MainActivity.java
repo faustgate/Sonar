@@ -66,7 +66,7 @@ public class MainActivity extends Activity {
             updateLabel();
         }
     };
-    private AdapterView.OnItemSelectedListener ICCarTypesClickListener = new AdapterView.OnItemSelectedListener() {
+    private AdapterView.OnItemSelectedListener ICCarTypesClickListener    = new AdapterView.OnItemSelectedListener() {
         @Override
         public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
             switch (position) {
@@ -232,6 +232,8 @@ public class MainActivity extends Activity {
             public void onClick(View v) {
                 name = nameEditText.getText().toString();
                 surname = surnameEditText.getText().toString();
+                UZRequests.getInstance().setCurrentStationFromId(stationFromId);
+                UZRequests.getInstance().setCurrentStationTillId(stationToId);
                 start();
             }
         });
@@ -393,7 +395,7 @@ public class MainActivity extends Activity {
                     stationToName,
                     stationToId,
                     getDateString());
-            Toast.makeText(getApplicationContext(), data, Toast.LENGTH_LONG).show();
+     //       Toast.makeText(getApplicationContext(), data, Toast.LENGTH_LONG).show();
             String trainData = UZRequests.getInstance().searchForTrains(stationFromId,
                     stationToId,
                     date.getTime());

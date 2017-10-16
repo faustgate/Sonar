@@ -40,10 +40,10 @@ public class CoachListActivity extends Activity {
 
         setContentView(R.layout.select_coach_layout);
         Spinner coachTypeFilterSpinner = (Spinner) findViewById(R.id.spinnerPlaceTypeFilter);
-
+        JSONObject curTrain;
 
         try {
-            JSONObject curTrain = new JSONObject(trainData);
+            curTrain = new JSONObject(trainData);
             List<JSONObject> ticketsData = UZRequests.getInstance().searchForTickets(curTrain);
 
             car_types = curTrain.getJSONArray("types");
@@ -61,6 +61,8 @@ public class CoachListActivity extends Activity {
 
                     currentCarDescription.put("number", places.getJSONObject(i).getString("num"));
                     currentCarDescription.put("coach_class", places.getJSONObject(i).getString("coach_class"));
+                    currentCarDescription.put("places_list", places.getJSONObject(i).getString("places_list"));
+                    currentCarDescription.put("places_count", places.getJSONObject(i).getString("places_cnt"));
 
                     Iterator prices = places.getJSONObject(i).getJSONObject("prices").keys();
                     while (prices.hasNext()) {
@@ -115,24 +117,19 @@ public class CoachListActivity extends Activity {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
+                    Intent intent = new Intent(CoachListActivity.this, PlacesActivity2.class);
+
+                    intent.putExtra("dat", new JSONObject(carDescriptions.get(position)).toString());
                     try {
-                        Intent intent = new Intent(CoachListActivity.this, PlacesActivity2.class);
-
-                        JSONObject sdf = new JSONObject();
-
-                        for (String key : carDescriptions.get(position).keySet()) {
-                            sdf.put(key, carDescriptions.get(position).get(key));
-
-                        }
-                        intent.putExtra("dat", sdf.toString());
-                        intent.putExtra("name", name);
-                        intent.putExtra("surname", surname);
-                        intent.putExtra("ticketsData", ticketsData.toString());
-
-                        startActivity(intent);
+                        intent.putExtra("train_num", curTrain.getString("num"));
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
+                    intent.putExtra("name", name);
+                    intent.putExtra("surname", surname);
+                    //intent.putExtra("ticketsData", ticketsData.toString());
+
+                    startActivity(intent);
                 }
             });
 
@@ -146,10 +143,7 @@ public class CoachListActivity extends Activity {
             //    });
 
 
-        } catch (
-                JSONException e)
-
-        {
+        } catch (JSONException e) {
             e.printStackTrace();
         }
 
