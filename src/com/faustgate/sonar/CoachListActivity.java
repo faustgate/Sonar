@@ -55,25 +55,25 @@ public class CoachListActivity extends Activity {
             }
 
             for (JSONObject ticketType : ticketsData) {
-                JSONArray places = ticketType.getJSONArray("coaches");
+                JSONArray places = ticketType.getJSONObject("data").getJSONArray("wagons");
                 for (int i = 0; i < places.length(); i++) {
                     HashMap<String, String> currentCarDescription = new HashMap<>();
 
                     currentCarDescription.put("number", places.getJSONObject(i).getString("num"));
-                    currentCarDescription.put("coach_class", places.getJSONObject(i).getString("coach_class"));
+                    currentCarDescription.put("coach_class", places.getJSONObject(i).getString("class"));
                     currentCarDescription.put("places_list", places.getJSONObject(i).getString("places_list"));
-                    currentCarDescription.put("places_count", places.getJSONObject(i).getString("places_cnt"));
+                    currentCarDescription.put("places_count", places.getJSONObject(i).getString("free"));
 
                     Iterator prices = places.getJSONObject(i).getJSONObject("prices").keys();
                     while (prices.hasNext()) {
                         String key = (String) prices.next();
                         currentCarDescription.put("price", places.getJSONObject(i).getJSONObject("prices").getString(key));
                     }
-                    String carClassLetter = places.getJSONObject(i).getString("type");
+                    String carClassLetter = places.getJSONObject(i).getString("type_id");
                     String carClassName = places.getJSONObject(i).getString("type");
-                    for (int j = 0; j < placeLetters.size(); j++) {
-                        if (placeLetters.get(j).equals(carClassLetter)) {
-                            carClassName = placeTypes.get(j + 1);
+                    for (int j = 0; j < car_types.length(); j++) {
+                        if (car_types.getJSONObject(j).getString("id").equals(carClassLetter)) {
+                            carClassName = car_types.getJSONObject(j).getString("title");
                         }
                     }
                     currentCarDescription.put("carClassLetter", carClassLetter);
@@ -122,6 +122,11 @@ public class CoachListActivity extends Activity {
                     intent.putExtra("dat", new JSONObject(carDescriptions.get(position)).toString());
                     try {
                         intent.putExtra("train_num", curTrain.getString("num"));
+                        intent.putExtra("from", curTrain.getJSONObject("from").getString("code"));
+                        intent.putExtra("to", curTrain.getJSONObject("to").getString("code"));
+                        intent.putExtra("date", curTrain.getJSONObject("from").getString("srcDate"));
+                        intent.putExtra("from_date", curTrain.getJSONObject("from").getString("sortTime"));
+                        intent.putExtra("to_date",   curTrain.getJSONObject("to").getString("sortTime"));
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }

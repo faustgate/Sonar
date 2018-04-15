@@ -7,6 +7,9 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -42,8 +45,12 @@ class PlaceListAdapter extends BaseAdapter {
             convertView = inflater.inflate(R.layout.item_place, parent, false);
         }
         HashMap<String, String> car = mObjects.get(position);
-        String number = car.get("train_num");
+        String trainNumber = car.get("train");
+        String carNumber = car.get("wagon_num");
+        String placeNumber = car.get("place_num");
         String carClassName = car.get("carClassName");
+        String fromDate = getDateFromTimestamp(car.get("from_date"));
+        String toDate = getDateFromTimestamp(car.get("to_date"));
         double price = 0;
         try {
             price = Integer.parseInt(car.get("price")) / 100.0;
@@ -52,10 +59,24 @@ class PlaceListAdapter extends BaseAdapter {
         }
         String new_price = String.valueOf(price);
 
-        ((TextView) convertView.findViewById(R.id.train_placeholder)).setText(number);
+        ((TextView) convertView.findViewById(R.id.train_placeholder)).setText(trainNumber);
         ((TextView) convertView.findViewById(R.id.price_placeholder)).setText(new_price);
+        ((TextView) convertView.findViewById(R.id.dep_placeholder)).setText(fromDate);
+        ((TextView) convertView.findViewById(R.id.arr_placeholder)).setText(toDate);
+        ((TextView) convertView.findViewById(R.id.car_placeholder)).setText(carNumber);
+        ((TextView) convertView.findViewById(R.id.place_placeholder)).setText(placeNumber);
        // ((TextView) convertView.findViewById(R.id.car_type)).setText(carClassName);
 
         return convertView;
+    }
+
+    private String getDateFromTimestamp(String timestamp){
+        String myFormat = mContext.getString(R.string.user_date_format);
+        SimpleDateFormat sdf = new SimpleDateFormat(myFormat, mContext.getResources().getConfiguration().locale);
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(Long.valueOf(timestamp) * 1000);
+        String dateStr = sdf.format(calendar.getTime());
+        dateStr = dateStr.substring(0, 1).toUpperCase() + dateStr.substring(1);
+        return dateStr;
     }
 }

@@ -66,6 +66,13 @@
     <string name="train_ic">Интерсіті</string>
     <string name="train_type">Тип поїзду:</string>
     <string name="train_usual">Звичайний</string>
-    <string name="user_date_format">EEEE, dd MMMM, yyyy</string>
+    <string name="user_date_format">EE, dd MMM, yyyy</string>
     <string name="place_count_header">Місць:</string>
+    <string name="services">Послуги</string>
+    <string name="wagon">Вагон</string>
+    <string name="train">Поїзд</string>
+    <string name="price">Ціна</string>
+    <string name="place">Місце</string>
+    <string name="show_trains_wo_places">Показати поїзди без свободних місць</string>
+    <string name="pay">Оплатити</string>
 </resources>

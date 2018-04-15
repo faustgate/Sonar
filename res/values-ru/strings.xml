@@ -47,7 +47,7 @@
     <string name="train_ic">Интерсити</string>
     <string name="train_type">Тип поезда:</string>
     <string name="train_usual">Обычный</string>
-    <string name="user_date_format">EEEE, dd MMMM yyyy г.</string>
+    <string name="user_date_format">EE, dd MMM yyyy г.</string>
     <string name="err_fill_name_body">Пожалуйста введите имя</string>
     <string name="err_fill_name_head">Пустое имя!</string>
     <string name="err_fill_surname_body">Пожалуйста введите фамилию</string>
@@ -68,4 +68,11 @@
     <string name="ticket_usual">Обычный</string>
     <string name="to">Куда</string>
     <string name="place_count_header">Мест:</string>
+    <string name="services">Услуги</string>
+    <string name="price">Цена</string>
+    <string name="place">Место</string>
+    <string name="train">Поезд</string>
+    <string name="wagon">Вагон</string>
+    <string name="show_trains_wo_places">Показать поезда без свободных мест</string>
+    <string name="pay">Оплатить</string>
 </resources>

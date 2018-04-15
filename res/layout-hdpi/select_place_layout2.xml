@@ -7,7 +7,7 @@
     <TextView
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="Hello"/>
+        android:text=""/>
 
     <HorizontalScrollView
         android:layout_width="wrap_content"
@@ -34,6 +34,6 @@
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Оплатить"
+        android:text="@string/pay"
         android:id="@+id/pay_button"/>
 </LinearLayout>

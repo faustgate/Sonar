@@ -70,26 +70,31 @@ public class TrainListAdapter extends BaseAdapter {
         try {
             train = (JSONObject) mObjects.get(position);
             from_obj = train.getJSONObject("from");
-            to_obj = train.getJSONObject("till");
+            to_obj = train.getJSONObject("to");
+
+            String src_date_from = from_obj.getString("date").substring(0,1).toUpperCase() + from_obj.getString("date").substring(1);
+            String src_date_to = to_obj.getString("date").substring(0,1).toUpperCase() + to_obj.getString("date").substring(1);
 
             number = train.getString("num");
-            from_name = from_obj.getString("station");
-            from_time = from_obj.getString("src_date");
-            to_name = to_obj.getString("station");
-            to_time = to_obj.getString("src_date");
+
+            from_name = from_obj.getString("stationTrain");
+            from_time =  src_date_from.substring(0, 3) + src_date_from.substring(src_date_from.indexOf(',')) + "\n" + from_obj.getString("time");
+
+            to_name = to_obj.getString("stationTrain");
+            to_time =  src_date_to.substring(0, 3) + src_date_to.substring(src_date_to.indexOf(',')) + "\n" + to_obj.getString("time");
+
             places_types_obj = train.getJSONArray("types");
 
-            if (places_types_obj != null) {
-                for (int i = 0; i < places_types_obj.length(); i++) {
-                    HashMap<String, String> type = new HashMap<>();
-                    Iterator places = places_types_obj.getJSONObject(i).keys();
-                    while (places.hasNext()) {
-                        String key = (String) places.next();
-                        type.put(key, places_types_obj.getJSONObject(i).getString(key));
-                    }
-                    places_types.add(type);
+            for (int i = 0; i < places_types_obj.length(); i++) {
+                HashMap<String, String> type = new HashMap<>();
+                Iterator places = places_types_obj.getJSONObject(i).keys();
+                while (places.hasNext()) {
+                    String key = (String) places.next();
+                    type.put(key, places_types_obj.getJSONObject(i).getString(key));
                 }
+                places_types.add(type);
             }
+
         } catch (JSONException e) {
             e.printStackTrace();
         }

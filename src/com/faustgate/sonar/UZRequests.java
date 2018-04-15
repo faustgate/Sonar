@@ -33,8 +33,10 @@ class UZRequests {
     private Map<String, String> formData = new HashMap<>();
     private Map<String, List<String>> lastHeaders;
     private Header[] cookies = new Header[]{};
-    private List<String> ticketFields = Arrays.asList("ord", "charline", "wagon_num", "wagon_class", "wagon_type", "firstname", "lastname", "bedding", "child", "stud", "transportation", "reserve", "place_num");
-    private List<String> formFields = Arrays.asList("from", "to", "train", "date", "round_trip");
+    private List<String> ticketFields = Arrays.asList("from", "to", "train", "date", "ord", "charline", "wagon_num",
+                                                      "wagon_class", "wagon_type", "firstname", "lastname", "bedding",
+                                                      "child", "stud", "transportation", "reserve", "place_num");
+    private List<String> formFields = Arrays.asList("roundtrip");
     private List<JSONObject> lastPlacesInfo = new ArrayList<>();
   //  private JSONObject lastTr = new ArrayList<>();
     private String auth_token, reservationId, lastFromStationId, lastTillStationId, lastDepDate,lastTrainsInfo, lastTrainId;
@@ -91,7 +93,7 @@ class UZRequests {
 
         List<HashMap<String, String>> stations = new ArrayList<>();
         try {
-            res = new GetUZData().execute(mContext.getString(R.string.base_url) + "/purchase/station/?term=" + first_letters).get();
+            res = new GetUZData().execute(mContext.getString(R.string.base_url) + "/train_search/station/?term=" + first_letters).get();
             JSONArray stt = new JSONArray(res);
             for (int i = 0; i < stt.length(); i++) {
                 HashMap<String, String> station = new HashMap<>();
@@ -113,14 +115,14 @@ class UZRequests {
 
         if (!station_from_id.equals(lastFromStationId) || !station_to_id.equals(lastTillStationId) || !strDateDep.equals(lastDepDate)) {
             dateDep = date;
-            formData.put("station_id_from", station_from_id);
-            formData.put("station_id_till", station_to_id);
-            formData.put("date_dep", strDateDep);
-            formData.put("time_dep", "00:00");
-            formData.put("time_dep_till", "");
+            formData.put("from", station_from_id);
+            formData.put("to", station_to_id);
+            formData.put("date", strDateDep);
+            formData.put("time", "00:00");
+            // formData.put("get_tpl", "1");
             formData.put("another_ec", "0");
             try {
-                Object res = new GetUZData().execute(mContext.getString(R.string.base_url) + "/purchase/search/").get();
+                Object res = new GetUZData().execute(mContext.getString(R.string.base_url) + "/train_search/").get();
                 lastTrainsInfo = StringEscapeUtils.unescapeJava(res.toString());
             } catch (InterruptedException | ExecutionException e) {
                 e.printStackTrace();
@@ -139,7 +141,7 @@ class UZRequests {
 
         try {
             String trainId = trainInfo.getString("num");
-            String date    = trainInfo.getJSONObject("from").getString("date");
+            String date    = trainInfo.getJSONObject("from").getString("srcDate");
 
             lastTrainInfo = trainInfo;
 
@@ -149,46 +151,49 @@ class UZRequests {
 
                 JSONArray car_types = trainInfo.getJSONArray("types");
                 initFormData();
-                formData.put("station_id_from", currentStationFromId);
-                formData.put("station_id_till", currentStationTillId);
-                formData.put("date_dep", date);
+                formData.put("from", currentStationFromId);
+                formData.put("to", currentStationTillId);
+                formData.put("date", date);
                 formData.put("train", trainId);
                 formData.put("another_ec", "0");
 
                 for (int i = 0; i < car_types.length(); i++) {
-                    if (formData.containsKey("coach_type"))
-                        formData.remove("coach_type");
-                    String placeId = trainInfo.getJSONArray("types").getJSONObject(i).getString("id");
-                    formData.put("coach_type", placeId);
+                    try {
+                        if (formData.containsKey("wagon_type_id"))
+                            formData.remove("wagon_type_id");
+                        String placeId = trainInfo.getJSONArray("types").getJSONObject(i).getString("id");
+                        formData.put("wagon_type_id", placeId);
 
-                    res = new GetUZData().execute(mContext.getString(R.string.base_url) + "/purchase/coaches/").get();
+                        res = new GetUZData().execute(mContext.getString(R.string.base_url) + "/train_wagons/").get();
 
-                    JSONObject coachesInfo = new JSONObject(res.toString());
+                        JSONObject coachesInfo = new JSONObject(res.toString());
 
-                    coachesInfo.remove("content");
+                        coachesInfo.remove("content");
 
-                    JSONArray availableCars = coachesInfo.getJSONArray("coaches");
-                    for (int j = 0; j < availableCars.length(); j++) {
-                        JSONObject currentCoachInfo = availableCars.getJSONObject(j);
-                        String coachNum = currentCoachInfo.getString("num");
-                        String coachClass = currentCoachInfo.getString("coach_class");
-                        if (formData.containsKey("coach_num"))
-                            formData.remove("coach_num");
-                        if (formData.containsKey("coach_class"))
-                            formData.remove("coach_class");
-                        formData.put("coach_num", coachNum);
-                        formData.put("coach_class", coachClass);
-                        formData.put("coach_type", placeId);
-                        res = new GetUZData().execute(mContext.getString(R.string.base_url) + "/purchase/coach/").get();
-                        tmp.add(res.toString());
-                        JSONObject coachInfo = new JSONObject(res.toString());
-                        JSONObject placesList = coachInfo.getJSONObject("value");
-                        availableCars.getJSONObject(j).put("places_list", placesList);
+                        JSONArray availableCars = coachesInfo.getJSONObject("data").getJSONArray("wagons");
+                        for (int j = 0; j < availableCars.length(); j++) {
+                            JSONObject currentCoachInfo = availableCars.getJSONObject(j);
+                            String coachNum = currentCoachInfo.getString("num");
+                            String coachClass = currentCoachInfo.getString("class");
+                            if (formData.containsKey("wagon_num"))
+                                formData.remove("wagon_num");
+                            if (formData.containsKey("wagon_class"))
+                                formData.remove("wagon_class");
+                            formData.put("wagon_num", coachNum);
+                            formData.put("wagon_class", coachClass);
+                            formData.put("wagon_type", placeId.replaceAll("[0-9]", ""));
+                            res = new GetUZData().execute(mContext.getString(R.string.base_url) + "/train_wagon/").get();
+                            tmp.add(res.toString());
+                            JSONObject coachInfo = new JSONObject(res.toString());
+                            JSONObject placesList = coachInfo.getJSONObject("data");
+                            availableCars.getJSONObject(j).put("places_list", placesList);
+                        }
+
+                        placesInfo.add(coachesInfo);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
                     }
-
-                    placesInfo.add(coachesInfo);
                 }
-
                 lastPlacesInfo = placesInfo;
 
             }

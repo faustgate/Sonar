@@ -5,7 +5,7 @@
     <string name="arr">Arr.:</string>
     <string name="base_url">https://booking.uz.gov.ua/en/</string>
     <string name="cart_address">/en/mobile/cart/</string>
-    <string name="date_format">MM.dd.yyyy</string>
+    <string name="date_format">yyyy-MM-dd</string>
     <string name="dep">Dep.:</string>
     <string name="err_fill_name_body">Please fill in name</string>
     <string name="err_fill_name_head">Empty name!</string>
@@ -66,6 +66,13 @@
     <string name="train_ic">Intercity</string>
     <string name="train_type">Train type:</string>
     <string name="train_usual">Usual</string>
-    <string name="user_date_format">EEEE, MMMM dd, yyyy</string>
+    <string name="user_date_format">EE, MMM dd, yyyy</string>
     <string name="place_count_header">Places:</string>
+    <string name="wagon">Wagon</string>
+    <string name="place">Place</string>
+    <string name="services">Services</string>
+    <string name="price">Price</string>
+    <string name="train">Train</string>
+    <string name="show_trains_wo_places">Show trains without places</string>
+    <string name="pay">Pay</string>
 </resources>

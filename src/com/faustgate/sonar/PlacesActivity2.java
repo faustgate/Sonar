@@ -14,6 +14,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 
@@ -21,10 +22,13 @@ public class PlacesActivity2 extends Activity {
     private JSONArray car_types;
     private ArrayAdapter<String> adapter;
     private ArrayList<HashMap<String, String>> placesDescription = new ArrayList<>();
-    Map<String, String[]> scheme_map = new HashMap<>();
+    private Map<String, String[]> scheme_map = new HashMap<>();
     ImageView base_layout;
-    Drawable scheme, available, busy, selected;
-    JSONObject currentCarDescription;
+    private Drawable scheme;
+    private Drawable available;
+    private Drawable selected;
+    private Drawable busy;
+    private JSONObject currentCarDescription;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -35,13 +39,18 @@ public class PlacesActivity2 extends Activity {
         String name       = intent.getStringExtra("name");
         String surname    = intent.getStringExtra("surname");
         String trainNum   = intent.getStringExtra("train_num");
+        String from   = intent.getStringExtra("from");
+        String to   = intent.getStringExtra("to");
+        String dateDep   = intent.getStringExtra("date");
+        String dateFrom   = intent.getStringExtra("from_date");
+        String dateTo   = intent.getStringExtra("to_date");
         setContentView(R.layout.select_place_layout2);
         // base_layout = (ImageView) findViewById(R.id.base_layout);
 
         scheme_map.put("К36", new String[]{"images/coupe_36.png", "schemes/coupe_36.json", "2044", "293", "34", "34"});
         scheme_map.put("К40", new String[]{"images/coupe_40.png", "schemes/coupe_40.json", "2044", "273", "32", "32"});
         scheme_map.put("П",   new String[]{"images/plazcart.png", "schemes/plazcart.json", "2044", "293", "32", "32"});
-        scheme_map.put("Л",   new String[]{"images/lux.png"});
+        scheme_map.put("Л",   new String[]{"images/lux.png",      "schemes/lux.json",      "2044", "293", "83", "31"});
         scheme_map.put("С1",  new String[]{"images/ic_class_1.png", "schemes/ic_class_1.json", "2292", "335", "82", "82"});
         scheme_map.put("С2",  new String[]{"images/ic_class_2.png", "schemes/ic_class_2.json", "2292", "335", "35", "40"});
 
@@ -59,36 +68,41 @@ public class PlacesActivity2 extends Activity {
 
             currentCarDescription = new JSONObject(carData);
 
-//            String key = "П";
+         //   String key = "Л";
             String key = currentCarDescription.getString("carClassLetter");
+
 
             if (key.contains("С")){
                 available = Drawable.createFromStream(getAssets().open("images/available_ic.png"), null);
-                busy      = Drawable.createFromStream(getAssets().open("images/busy_ic.png"), null);
+                busy = Drawable.createFromStream(getAssets().open("images/busy_ic.png"), null);
                 selected  = Drawable.createFromStream(getAssets().open("images/selected_ic.png"), null);
             }
             else {
                 available = Drawable.createFromStream(getAssets().open("images/available.png"), null);
-                busy      = Drawable.createFromStream(getAssets().open("images/busy.png"), null);
+                busy = Drawable.createFromStream(getAssets().open("images/busy.png"), null);
                 selected  = Drawable.createFromStream(getAssets().open("images/selected.png"), null);
             }
 
 
-            JSONObject places_cont = new JSONObject(currentCarDescription.getString("places_list")).getJSONObject("places");
+            JSONObject freePlacesList = new JSONObject(currentCarDescription.getString("places_list")).getJSONObject("places");
+
             JSONArray  places      = new JSONArray();
-            Iterator   places_iter = places_cont.keys();
+            Iterator   places_iter = freePlacesList.keys();
+
             while (places_iter.hasNext()) {
-                places = places_cont.getJSONArray((String) places_iter.next());
+                places = freePlacesList.getJSONArray((String) places_iter.next());
             }
-            List<String> new_places = new ArrayList<>();
+
+            List<Integer> freePlaces = new ArrayList<>();
 
             for (int j = 0; j < places.length(); j++) {
-                new_places.add(places.getString(j));
+                freePlaces.add(Integer.parseInt(places.getString(j)));
             }
+
 
             if (key.equals("К")) {
                 for (int i = 37; i <= 40; i++) {
-                    if (new_places.contains(String.valueOf(i))) {
+                    if (freePlaces.contains(i)) {
                         isExtended = true;
                         break;
                     }
@@ -128,12 +142,12 @@ public class PlacesActivity2 extends Activity {
                 long curY = gen_places.getJSONObject(i).getLong("Y");
 
                 place_map[curID - 1].put("X", String.valueOf(curX));
-                place_map[curID - 1].put("X", String.valueOf(curY));
+                place_map[curID - 1].put("Y", String.valueOf(curY));
 
 
                 ImageView cur_view = new ImageView(getApplicationContext());
 
-               if (new_places.contains(String.valueOf(curID))) {
+                if (freePlaces.contains(curID)) {
                     cur_view.setImageDrawable(available);
                     cur_view.setOnClickListener(new View.OnClickListener() {
                         @Override
@@ -157,13 +171,22 @@ public class PlacesActivity2 extends Activity {
                                         currentTicketDescription.put("wagon_num", currentCarDescription.getString("number"));
                                         currentTicketDescription.put("charline", currentCarDescription.getString("coach_class"));
                                         currentTicketDescription.put("wagon_class", currentCarDescription.getString("coach_class"));
-                                        currentTicketDescription.put("wagon_type", currentCarDescription.getString("carClassLetter"));
+                                        String wagonType = currentCarDescription.getString("carClassLetter");
+                                        if (wagonType.contains("С"))
+                                            wagonType = wagonType.replaceAll("[0-9]", "");
+                                        currentTicketDescription.put("wagon_type", wagonType);
                                         currentTicketDescription.put("place_num", String.valueOf(placeId));
+
 
                                     } catch (JSONException e) {
                                         e.printStackTrace();
                                     }
-                                    currentTicketDescription.put("train_num", trainNum);
+                                    currentTicketDescription.put("from", from);
+                                    currentTicketDescription.put("to",   to);
+                                    currentTicketDescription.put("date", dateDep);
+                                    currentTicketDescription.put("from_date", dateFrom);
+                                    currentTicketDescription.put("to_date", dateTo);
+                                    currentTicketDescription.put("train", trainNum);
                                     currentTicketDescription.put("firstname", name);
                                     currentTicketDescription.put("lastname", surname);
                                     currentTicketDescription.put("ord", "0");
@@ -188,12 +211,14 @@ public class PlacesActivity2 extends Activity {
                             placeListAdapter.notifyDataSetChanged();
                         }
                     });
-                }else {
+                } else {
                     cur_view.setImageDrawable(busy);
                 }
 
                 cur_view.setX(getPixelsFromDP(curX));
                 cur_view.setY(getPixelsFromDP(curY));
+
+                cur_view.setScaleType(ImageView.ScaleType.FIT_XY);
 
                 cur_view.setMinimumHeight(getPixelsFromDP(Integer.parseInt(scheme_info[4])));
 
@@ -204,8 +229,8 @@ public class PlacesActivity2 extends Activity {
                 al.addView(cur_view);
             }
 
-            Button play_button = (Button) findViewById(R.id.pay_button);
-            play_button.setOnClickListener(new View.OnClickListener() {
+            Button pay_button = (Button) findViewById(R.id.pay_button);
+            pay_button.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
 

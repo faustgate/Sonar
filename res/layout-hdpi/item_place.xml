@@ -17,14 +17,14 @@
         android:layout_marginRight="0.5dp">
 
         <TextView
-            android:text="Поезд:"
+            android:text="@string/train"
             android:layout_height="match_parent"
             android:layout_width="match_parent"
             android:gravity="center"
             android:id="@+id/train_head" />
 
         <TextView
-            android:text="638Ш"
+            android:text=""
             android:layout_height="match_parent"
             android:layout_width="match_parent"
             android:gravity="center"
@@ -40,7 +40,7 @@
         android:layout_marginBottom="0.5dp">
 
         <TextView
-            android:text="Отпр: "
+            android:text="@string/dep"
             android:layout_height="match_parent"
             android:layout_width="match_parent"
             android:gravity="center"
@@ -51,7 +51,7 @@
         <TextView
             android:layout_marginBottom="0.5dp"
             android:background="#000"
-            android:text="Приб: "
+            android:text="@string/arr"
             android:layout_height="match_parent"
             android:layout_width="match_parent"
             android:gravity="center"
@@ -69,20 +69,20 @@
             android:layout_marginBottom="0.5dp"
             android:layout_marginRight="0.5dp"
             android:background="#000"
-            android:text="Пон, 22.08 18:56"
+            android:text=""
             android:layout_height="match_parent"
             android:layout_width="match_parent"
-            android:gravity="left"
+            android:gravity="start"
             android:id="@+id/dep_placeholder" />
 
         <TextView
             android:layout_marginBottom="0.5dp"
             android:layout_marginRight="0.5dp"
             android:background="#000"
-            android:text="Вт, 23.08 10:13"
+            android:text=""
             android:layout_height="match_parent"
             android:layout_width="match_parent"
-            android:gravity="left"
+            android:gravity="start"
             android:id="@+id/arr_placeholder"
             />
     </LinearLayout>
@@ -96,16 +96,16 @@
             android:layout_marginBottom="0.5dp"
 
             android:background="#000"
-            android:text="Вагон:"
+            android:text="@string/wagon"
             android:layout_height="match_parent"
             android:layout_width="match_parent"
-            android:gravity="right"
+            android:gravity="end"
             android:id="@+id/car_head" />
 
         <TextView
             android:layout_marginBottom="0.5dp"
             android:background="#000"
-            android:text="Место:"
+            android:text="@string/place"
             android:layout_height="match_parent"
             android:layout_width="match_parent"
             android:gravity="center"
@@ -123,7 +123,7 @@
             android:layout_marginBottom="0.5dp"
             android:layout_marginRight="0.5dp"
             android:background="#000"
-            android:text="6"
+            android:text=""
             android:layout_height="match_parent"
             android:layout_width="match_parent"
             android:gravity="center"
@@ -134,7 +134,7 @@
             android:layout_marginBottom="0.5dp"
             android:layout_marginRight="0.5dp"
             android:background="#000"
-            android:text="13"
+            android:text=""
             android:layout_height="match_parent"
             android:layout_width="match_parent"
             android:gravity="center"
@@ -153,7 +153,7 @@
         android:layout_weight="1">
 
         <TextView
-            android:text="Услуги:"
+            android:text="@string/services"
             android:layout_height="match_parent"
             android:layout_width="match_parent"
             android:gravity="center"
@@ -161,7 +161,7 @@
 
         <TextView
             android:textSize="11dp"
-            android:text="Пост, Чай: 2"
+            android:text=""
             android:layout_height="match_parent"
             android:layout_width="match_parent"
             android:gravity="center"
@@ -179,14 +179,14 @@
         android:layout_marginRight="1dp">
 
         <TextView
-            android:text="Цена:"
+            android:text="@string/price"
             android:layout_height="match_parent"
             android:layout_width="match_parent"
             android:gravity="center"
             android:id="@+id/price_head" />
 
         <TextView
-            android:text="117,53"
+            android:text=""
             android:layout_height="match_parent"
             android:layout_width="match_parent"
             android:gravity="center"

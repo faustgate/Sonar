@@ -8,7 +8,7 @@
     android:paddingRight="10dp">
 
     <TextView
-        android:text="113Ш"
+        android:text=""
         android:layout_height="match_parent"
         android:layout_width="wrap_content"
         android:gravity="center"
@@ -25,7 +25,7 @@
             android:layout_weight="1"
             android:layout_height="match_parent"
             android:layout_width="match_parent"
-            android:text="Одесса - Киев"
+            android:text=""
             android:id="@+id/train_direction"
             android:gravity="center" />
 
@@ -48,7 +48,7 @@
                 android:layout_weight="0.9"
                 android:layout_height="match_parent"
                 android:layout_width="fill_parent"
-                android:text="13.13.2013"
+                android:text=""
                 android:gravity="center|start"
                 android:id="@+id/train_dep_date_field"
                 android:textSize="10dp" />
@@ -65,7 +65,7 @@
                 android:layout_weight="0.9"
                 android:layout_height="match_parent"
                 android:layout_width="match_parent"
-                android:text="11.11.2016"
+                android:text=""
                 android:id="@+id/train_arr_date_field"
                 android:gravity="center|start"
                 android:textSize="10dp" />

@@ -131,12 +131,12 @@ public class MainActivity extends Activity {
                 getString(R.string.ticket_stud));
 
         stationFromEdit = (DelayAutoCompleteTextView) findViewById(R.id.stationFrom);
-        stationToEdit = (DelayAutoCompleteTextView) findViewById(R.id.stationTo);
+        stationToEdit   = (DelayAutoCompleteTextView) findViewById(R.id.stationTo);
 
         Button search = (Button) findViewById(R.id.button);
 
-        dateEditText = (EditText) findViewById(R.id.dateEditText);
-        nameEditText = (EditText) findViewById(R.id.nameEditText);
+        dateEditText    = (EditText) findViewById(R.id.dateEditText);
+        nameEditText    = (EditText) findViewById(R.id.nameEditText);
         surnameEditText = (EditText) findViewById(R.id.surnameEditText);
 
         DatePickerDialog datePickerDialog = new CustomDatePickerDialog(MainActivity.this, dateSetListener);
@@ -400,25 +400,22 @@ public class MainActivity extends Activity {
                     stationToId,
                     date.getTime());
             try {
-                JSONObject resp = new JSONObject(trainData);
+                JSONObject resp = new JSONObject(trainData).getJSONObject("data");
+                if (resp.has("warning")) {
+                    if (resp.getString("warning").contains("No places")) {
+                        showTrainSearchOptionsMessage();
+                        return;
+                    }
+                }
+
                 JSONArray corrTrains = new JSONArray();
                 JSONArray corrPlacesTrains = new JSONArray();
-                if (resp.getString("error").equals("true")) {
-                    if (resp.has("value")) {
-                        if (resp.getString("value").contains("No places")) {
-                            showTrainSearchOptionsMessage();
-                        }
-                    }
+
+
+                if (!resp.has("list")) {
                     return;
                 }
-                if (!resp.has("value")) {
-                    return;
-                }
-                JSONArray trains = resp.getJSONArray("value");
-                if (trains.length() == 0) {
-                    showTrainSearchOptionsMessage();
-                    return;
-                }
+                JSONArray trains = resp.getJSONArray("list");
                 if (targetTicketDescription.get("trainType").equals("")) {
                     corrTrains = trains;
                 } else {
@@ -462,6 +459,7 @@ public class MainActivity extends Activity {
                     startActivity(intent);
                 }
             } catch (JSONException e) {
+                Toast.makeText(getApplicationContext(), "Unknown Error", Toast.LENGTH_SHORT).show();
                 e.printStackTrace();
             }
 
