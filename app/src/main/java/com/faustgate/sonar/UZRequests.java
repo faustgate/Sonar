@@ -5,7 +5,6 @@ import android.os.AsyncTask;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.apache.commons.lang.StringEscapeUtils;
 
 import java.io.*;
 import java.net.HttpURLConnection;
@@ -114,7 +113,8 @@ class UZRequests {
             formData.put("another_ec", "0");
             try {
                 Object res = new GetUZData().execute(mContext.getString(R.string.base_url) + "/train_search/").get();
-                lastTrainsInfo = StringEscapeUtils.unescapeJava(res.toString());
+                lastTrainsInfo = res.toString();
+//                lastTrainsInfo = StringEscapeUtils.unescapeJava(res.toString());
             } catch (InterruptedException | ExecutionException e) {
                 e.printStackTrace();
             }
@@ -211,7 +211,8 @@ class UZRequests {
             isBuying = true;
             Object res = new GetUZData().execute(mContext.getString(R.string.base_url) + "/cart/add/").get();
             isBuying = false;
-            result = StringEscapeUtils.unescapeJava(res.toString());
+            result = res.toString();
+           // result = StringEscapeUtils.unescapeJava(res.toString());
         } catch (InterruptedException | ExecutionException | JSONException e) {
             e.printStackTrace();
         }
@@ -224,7 +225,8 @@ class UZRequests {
             initFormData();
             formData.put("reserve_ids", reservationId);
             Object res = new GetUZData().execute(mContext.getString(R.string.base_url) + "cart/revocation/").get();
-            result = StringEscapeUtils.unescapeJava(res.toString());
+            result = res.toString();
+           // result = StringEscapeUtils.unescapeJava(res.toString());
         } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
         }
