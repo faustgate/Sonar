@@ -1,3 +1,8 @@
+.DS_Store
+/build
+/captures
+.externalNativeBuild
+
 # Built application files
 *.apk
 *.ap_
@@ -15,6 +20,7 @@ out/
 
 # Gradle files
 .gradle/
+/gradle
 build/
 
 # Local configuration file (sdk path, etc)
@@ -33,9 +39,8 @@ proguard/
 captures/
 
 # Intellij
-*.iml
-.idea/workspace.xml
 .idea
+*.iml
 
 # Keystore files
 *.jks
