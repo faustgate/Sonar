@@ -1,0 +1,217 @@
+Atos
+
+1. GET on http://booking.uz.gov.ua/en/purchase/station/{FLSN}/ where {FLSN} is the First Letters of City Name, response example for "Odessa" input:
+{
+ "value": [
+ {
+ "title": "Odesa",
+ "station_id": "2208001"
+ }
+ ],
+ "error": null,
+ "data": {
+ "req_text": [
+ "od",
+ "\u0449\u0432"
+ ]
+ },
+ "captcha": null
+}
+
+2. GET on http://booking.uz.gov.ua/en/purchase/search/ with URLEncoded string like: station_id_from=2208001&station_id_till=2200001&station_from=Odesa&station_till=Kyiv&date_dep=10.31.2016&time_dep=00%3A00&time_dep_till=&another_ec=0&search=
+where 2208001 and 2200001 are station id's got in response on step 1 and 10.31.2016 is a date in format MM.DD.YYYY if request sent on address with "en" between "http://booking.uz.gov.ua/" and "purchase/" or DD.MM.YYYY if any other lang-code
+Response example:
+{
+ "value": [
+ {
+ "num": "764\u041b",
+ "model": 4,
+ "category": 1,
+ "travel_time": "6:59",
+ "from": {
+ "station_id": 2208001,
+ "station": "Odesa-Holovna",
+ "date": 1477885320,
+ "src_date": "2016-10-31 05:42:00"
+ },
+ "till": {
+ "station_id": 2200001,
+ "station": "Darnytsya",
+ "date": 1477910460,
+ "src_date": "2016-10-31 12:41:00"
+ },
+ "types": [
+ {
+ "title": "Seating first class",
+ "letter": "\u04211",
+ "places": 127
+ },
+ {
+ "title": "Seating second class",
+ "letter": "\u04212",
+ "places": 257
+ }
+ ]
+ },
+ {
+ "num": "106\u0428",
+ "model": 0,
+ "category": 0,
+ "travel_time": "9:20",
+ "from": {
+ "station_id": 2208001,
+ "station": "Odesa-Holovna",
+ "date": 1477943400,
+ "src_date": "2016-10-31 21:50:00"
+ },
+ "till": {
+ "station_id": 2200001,
+ "station": "Kyiv-Pasazhyrsky",
+ "date": 1477977000,
+ "src_date": "2016-11-01 07:10:00"
+ },
+ "types": [
+ {
+ "title": "Suite \/ first-class sleeper",
+ "letter": "\u041b",
+ "places": 12
+ },
+ {
+ "title": "Coupe \/ coach with compartments",
+ "letter": "\u041a",
+ "places": 18
+ }
+ ]
+ }
+ ],
+ "error": null,
+ "data": null,
+ "captcha": null
+}
+
+
+3. POST on http://booking.uz.gov.ua/en/purchase/coaches/ with
+"station_id_from=2208001&station_id_till=2200001&train=024%D0%A8&coach_type=%D0%9A&model=0&date_dep=1477917180&round_trip=0&another_ec=0" in form data where 2208001 and 2200001 are station id's got in response on step 1, 024%D0%A8 is train id got in field "num" in step 2
+Response example:
+{
+ "content": "<div id=\"ts_chs_coach_tooltip\"><\/div>\n<div id=\"ts_chs_scheme\" class=\"coach-scheme\"><div class=\"s3\">\n <img src=\"http:\/\/booking.uz.gov.ua\/i\/img\/coach\/coupe.png\" \/>\n <b class=\"wnum\" style=\"left: 7px; top: 8px; width: 35px; height: 112px\"><span><\/span><\/b>",
+ "coach_type_id": 3,
+ "coaches": [
+ {
+	 "num": 5,
+	 "type": "\u041a",
+	 "allow_bonus": false,
+	 "places_cnt": 30,
+	 "has_bedding": true,
+	 "reserve_price": 1700,
+	 "services": [
+		 "\u0427",
+		 "\u0428"
+	 ],
+	 "prices": {
+	 	"\u0418": 17409
+	 },
+	 "coach_type_id": 3,
+	 "coach_class": "\u0414"
+ }
+ ],
+ "places_allowed": 8,
+ "places_max": 8
+}
+
+4. POST on http://booking.uz.gov.ua/en/purchase/coach/ with "station_id_from=2208001&station_id_till=2200001&train=024%D0%A8&coach_num=5&coach_class=%D0%94&coach_type_id=3&date_dep=1477917180&change_scheme=0" in form data where 2208001 and 2200001 are station id's got in response on step 1, 024%D0%A8 is train id got in field "num" in step 2, value of coach_num is number in field "num" got in step 3
+Response example:
+{
+ "value": {
+ "places": {
+ "\u0418": [
+ "1",
+ "2",
+ "3",
+ "4",
+ "5",
+ "6",
+ "7",
+ "8",
+ "10",
+ "12",
+ "13",
+ "14",
+ "15",
+ "16",
+ "21",
+ "22",
+ "23",
+ "24",
+ "25",
+ "26",
+ "27",
+ "28",
+ "29",
+ "30",
+ "31",
+ "32",
+ "33",
+ "34",
+ "35",
+ "36"
+ ]
+ }
+ },
+ "error": null,
+ "data": null,
+ "captcha": null
+}
+where "\u0418" is the letter of car type in Unicode-escape format and it values is place numbers in car
+
+
+5. POST on http://booking.uz.gov.ua/en/cart/add/ with code_station_from=2208001&code_station_to=2200001&train=106%D0%A8&date=1477943400&round_trip=0&places[0][ord]=0&places[0][coach_num]=3&places[0][coach_class]=%D0%91&places[0][coach_type_id]=3&places[0][place_num]=24&places[0][firstname]=hdfgh&places[0][lastname]=dfgh&places[0][bedding]=1&places[0][child]=&places[0][stud]=&places[0][transp]=0&places[0][reserve]=0 
+
+in form data where 2208001 and 2200001 are station id's got in response on step 1, 106%D0%A8 is train id got in field "num" in step 2, value of coach_num is number in field "num" got in step 3
+
+parsed view:
+
+code_station_from:2208001
+code_station_to:2200001
+train:106Ш
+date:1477943400
+
+round_trip:0
+places[0][ord]:0
+places[0][coach_num]:3
+places[0][coach_class]:Б
+places[0][coach_type_id]:3
+places[0][place_num]:24
+places[0][firstname]:hdfgh
+places[0][lastname]:dfgh
+places[0][bedding]:1
+places[0][child]:
+places[0][stud]:
+places[0][transp]:0
+places[0][reserve]:0
+
+
+code_station_from and code_station_to doesn't need explanation
+places[0] - array where each ticket is an element
+places[0][coach_num]:3 - 3 number of car where place is placed got in step 4
+places[0][coach_class]:Б - value got in step 3
+places[0][coach_type_id]:3 - value got in step 3
+places[0][place_num]:24 - place number selected from data got in step 4
+places[0][firstname]:hdfgh - Passenger first name
+places[0][lastname]:dfgh - Passenger second name
+places[0][bedding]:1 is bedding included [1 - yes; 0 - no]
+places[0][child]: Is passenger child
+places[0][stud]: Is passenger student
+places[0][transp]:0 Does passenger have luggage
+places[0][reserve]:0 is this transaction buying or only booking [1 - booking; 0 - buying]
+
+Response example:
+{
+ "value": {
+ "page": " <h3>Cart<\/h3>\n <table id=\"cart_table\" class=\"vToolsDataTable\" cellspacing=\"1\" cellpadding=\"0\" border=\"0\" width=\"100%\">\n <thead>\n <tr>\n <th class=\"num\">\u2116<\/th>\n <th class=\"data\">Place<\/th>\n <th class=\"price\">Price (UAH)<\/th>\n <th class=\"cart-btn\"><\/th>\n <\/tr>\n <\/thead>\n <tbody>\n <tr _reserve_id=\"410936112\" _time=\"254\" data-doctype=\"1\" data-used-bonus=\"0\">\n <td class=\"num\">1<\/td>\n <td class=\"data\">\n <div>\n <span class=\"ticket-kinds tooltip\" data-tooltip=\"Order form is not valid for boarding. Print it in the ticket office of PJSC&nbsp;&quot;Ukrainian railway&quot;\"><i class=\"non-electronic-ticket\"><\/i><\/span>\n Train: <b>244 \u0428<\/b>, Coach: <b>08\u041a<\/b>, Place: \n <i class=\"full\"><\/i><b title=\"Full\" class=\"ticket-kinds\">\n \n 030<\/b>\n \n <br\/>\n <span>\n 2016-10-31 23:53:00, Odesa-Holovna &gt; Kyiv-Pasazhyrsky, Travel <\/span>\n <br\/>\n <span>\n Bed linen <\/span>\n <br\/> <ul>\n <li>\n fhs sdfgs - Place: 030 <\/li>\n <\/ul>\n <\/div>\n <p>\n Time Left:<br\/>\n <b class=\"time-left\"><\/b>\n <\/p>\n <\/td>\n <td class=\"price\">\n 214.48\n <\/td>\n <td class=\"cart-btn\">\n <a href=\"#\">Cancel the order<\/a>\n <\/td>\n <\/tr>\n <tr _reserve_id=\"410936532\" _time=\"307\" data-doctype=\"1\" data-used-bonus=\"0\">\n <td class=\"num\">2<\/td>\n <td class=\"data\">\n <div>\n <span class=\"ticket-kinds tooltip\" data-tooltip=\"This travel document is a basis for the travel\"><i class=\"electronic-ticket\"><\/i><\/span>\n Train: <b>106 \u0428<\/b>, Coach: <b>08\u041b<\/b>, Place: \n <i class=\"full\"><\/i><b title=\"Full\" class=\"ticket-kinds\">\n \n 006<\/b>\n \n <br\/>\n <span>\n 2016-10-31 21:50:00, Odesa-Holovna &gt; Kyiv-Pasazhyrsky, Travel <\/span>\n <br\/>\n <span>\n Bed linen <\/span>\n <br\/> <ul>\n <li>\n jdfgj djdghd - Place: 006 <\/li>\n <\/ul>\n <\/div>\n <p>\n Time Left:<br\/>\n <b class=\"time-left\"><\/b>\n <\/p>\n <\/td>\n <td class=\"price\">\n 660.62\n <\/td>\n <td class=\"cart-btn\">\n <a href=\"#\">Cancel the order<\/a>\n <\/td>\n <\/tr>\n <tr _reserve_id=\"410938662\" _time=\"619\" data-doctype=\"2\" data-used-bonus=\"0\">\n <td class=\"num\">3<\/td>\n <td class=\"data\">\n <div>\n <span class=\"ticket-kinds tooltip\" data-tooltip=\"Reservation with the following purchase\"><i class=\"non-electronic-ticket\"><\/i><\/span>\n Train: <b>244 \u0428<\/b>, Coach: <b>08\u041a<\/b>, Place: \n <b>\n \n 018<\/b>\n \n <br\/>\n <span>\n 2016-10-31 23:53:00, Odesa-Holovna &gt; Kyiv-Pasazhyrsky, Reserve <\/span>\n <br\/><span class=\"mark-warn\">Buy out at the booking office until:&nbsp;\n 10.20.2016 12:50 PM<\/span>\n <br\/> <ul>\n <li>\n djnd dghdghd - Place: 018 <\/li>\n <\/ul>\n <\/div>\n <p>\n Time Left:<br\/>\n <b class=\"time-left\"><\/b>\n <\/p>\n <\/td>\n <td class=\"price\">\n 17.00\n <\/td>\n <td class=\"cart-btn\">\n <a href=\"#\">Cancel the order<\/a>\n <\/td>\n <\/tr>\n <tr _reserve_id=\"410939812\" _time=\"781\" data-doctype=\"1\" data-used-bonus=\"0\">\n <td class=\"num\">4<\/td>\n <td class=\"data\">\n <div>\n <span class=\"ticket-kinds tooltip\" data-tooltip=\"Order form is not valid for boarding. Print it in the ticket office of PJSC&nbsp;&quot;Ukrainian railway&quot;\"><i class=\"non-electronic-ticket\"><\/i><\/span>\n Train: <b>244 \u0428<\/b>, Coach: <b>08\u041a<\/b>, Place: \n <i class=\"full\"><\/i><b title=\"Full\" class=\"ticket-kinds\">\n \n 028<\/b>\n \n <br\/>\n <span>\n 2016-10-31 23:53:00, Odesa-Holovna &gt; Kyiv-Pasazhyrsky, Travel <\/span>\n <br\/> <ul>\n <li>\n sdfg sfgs - Place: 028 <\/li>\n <\/ul>\n <\/div>\n <p>\n Time Left:<br\/>\n <b class=\"time-left\"><\/b>\n <\/p>\n <\/td>\n <td class=\"price\">\n 189.48\n <\/td>\n <td class=\"cart-btn\">\n <a href=\"#\">Cancel the order<\/a>\n <\/td>\n <\/tr>\n <tr _reserve_id=\"410940722\" _time=\"901\" data-doctype=\"1\" data-used-bonus=\"0\">\n <td class=\"num\">5<\/td>\n <td class=\"data\">\n <div>\n <span class=\"ticket-kinds tooltip\" data-tooltip=\"Order form is not valid for boarding. Print it in the ticket office of PJSC&nbsp;&quot;Ukrainian railway&quot;\"><i class=\"non-electronic-ticket\"><\/i><\/span>\n Train: <b>244 \u0428<\/b>, Coach: <b>08\u041a<\/b>, Place: \n <i class=\"full\"><\/i><b title=\"Full\" class=\"ticket-kinds\">\n \n 032<\/b>\n \n <br\/>\n <span>\n 2016-10-31 23:53:00, Odesa-Holovna &gt; Kyiv-Pasazhyrsky, Travel <\/span>\n <br\/>\n <span>\n Bed linen <\/span>\n <br\/> <ul>\n <li>\n shs sfgsf - Place: 032 <\/li>\n <\/ul>\n <\/div>\n <p>\n Time Left:<br\/>\n <b class=\"time-left\"><\/b>\n <\/p>\n <\/td>\n <td class=\"price\">\n 214.48\n <\/td>\n <td class=\"cart-btn\">\n <a href=\"#\">Cancel the order<\/a>\n <\/td>\n <\/tr>\n <\/tbody>\n <\/table>\n <div class=\"ticket_kinds_info\">\n <div class=\"ticket-kind-list\">\n <span class=\"ticket-kinds\">\n <i class=\"electronic-ticket\"><\/i> \u2014 Boarding pass, <\/span>\n\n <span class=\"ticket-kinds\">\n <i class=\"non-electronic-ticket\"><\/i> \u2014 Order Form, <\/span>\n\n <span class=\"ticket-kinds\"><i class=\"full\"><\/i> \u2014 Full, <\/span>\n <span class=\"ticket-kinds\"><i class=\"child\"><\/i> \u2014 Child , <\/span>\n <span class=\"ticket-kinds\"><i class=\"stud\"><\/i> \u2014 Student<\/span>\n <\/div>\n <button id=\"transportation_buy\">Buy waybill<\/button>\n <\/div>\n <div class=\"clear\"><\/div>\n <div class=\"buttons\">\n <button class=\"complex_btn\">\n <b>1&nbsp;296.06 UAH<\/b><span>Pay<\/span>\n <\/button>\n <\/div>\n <div class=\"clear\">&nbsp;<\/div>\n <br\/>\n <form class=\"cart_pay_form\" action=\"http:\/\/booking.uz.gov.ua\/en\/cart\/pay\/\" name=\"cart_pay_form\"\n style=\"display: none;\" method=\"post\">\n <div style=\"text-align: left; margin-bottom: 20px;\" xmlns=\"http:\/\/www.w3.org\/1999\/html\">\n If You are our regular user, please <a href=\"http:\/\/booking.uz.gov.ua\/en\/authorization\/\">login<\/a>.&nbsp;\n The system will automatically use the data contained in Your profile.\n<\/div>\n <label><span>E-mail:<\/span> <input name=\"email\" value=\"\"\/><\/label>\n<label style=\"line-height:28px;\">\n <input style=\"width:25px;\" type=\"checkbox\" name=\"is_confirmed\" value=\"1\"\/>\n <span style=\"width: 350px;\">The agreement with&nbsp;\n <a target=\"_blank\" href=\"http:\/\/booking.uz.gov.ua\/en\/info\/contractForm\/\">the contract offer<\/a>\n <\/span>\n<\/label>\n<br\/>\n<button>Pay<\/button>\n <\/form>\n <div id=\"transportation_cont\" style=\"display: none;\"><\/div>\n",
+ "places_count": 5
+ },
+ "error": false,
+ "data": null,
+ "captcha": null
+}
