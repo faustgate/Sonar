@@ -10,12 +10,12 @@ import android.widget.TextView;
 import java.util.HashMap;
 import java.util.List;
 
-class CoachListAdapter extends BaseAdapter {
+class AdapterCoachList extends BaseAdapter {
 
     private final Context mContext;
     private List<HashMap<String, String>> mObjects;
 
-    CoachListAdapter(Context context, List<HashMap<String, String>> values) {
+    AdapterCoachList(Context context, List<HashMap<String, String>> values) {
         mContext = context;
         mObjects = values;
     }

@@ -22,9 +22,9 @@ import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-public class MainActivity extends Activity {
+public class ActivityMain extends Activity {
     private Calendar date = Calendar.getInstance();
-    Spinner buySpinner;
+    Spinner buySpinner, ticketTypeSpinner, placesAmountSpinner, carTypeSpinner, trainTypesSpinner;
     private String stationFromId = "";
     private String stationFromName = "";
     private String stationToId = "";
@@ -63,6 +63,7 @@ public class MainActivity extends Activity {
                 buySpinner.setEnabled(false);
             }
 
+            TicketDescription.getInstance().setDepartureDate(date.getTime());
             updateLabel();
         }
     };
@@ -130,25 +131,23 @@ public class MainActivity extends Activity {
                 getString(R.string.ticket_child),
                 getString(R.string.ticket_stud));
 
-        stationFromEdit = (DelayAutoCompleteTextView) findViewById(R.id.stationFrom);
-        stationToEdit   = (DelayAutoCompleteTextView) findViewById(R.id.stationTo);
+        stationFromEdit = findViewById(R.id.stationFrom);
+        stationToEdit   = findViewById(R.id.stationTo);
 
-        Button search = (Button) findViewById(R.id.button);
+        Button search = findViewById(R.id.button);
 
-        dateEditText    = (EditText) findViewById(R.id.dateEditText);
-        nameEditText    = (EditText) findViewById(R.id.nameEditText);
-        surnameEditText = (EditText) findViewById(R.id.surnameEditText);
+        dateEditText    = findViewById(R.id.dateEditText);
+        nameEditText    = findViewById(R.id.nameEditText);
+        surnameEditText = findViewById(R.id.surnameEditText);
 
-        DatePickerDialog datePickerDialog = new DatePickerDialog(MainActivity.this, dateSetListener,
-                date.get(Calendar.YEAR), date.get(Calendar.MONTH),
-                date.get(Calendar.DAY_OF_MONTH));
+        DatePickerDialog datePickerDialog = new CustomDatePickerDialog(ActivityMain.this, dateSetListener);
         updateLabel();
 
-        Spinner trainTypesSpinner = (Spinner) findViewById(R.id.trainTypeSpinner);
-        Spinner carTypeSpinner = (Spinner) findViewById(R.id.carTypeSpinner);
-        buySpinner = (Spinner) findViewById(R.id.buySpinner);
-        Spinner ticketTypeSpinner = (Spinner) findViewById(R.id.ticketTypeSpinner);
-        Spinner placesAmountSpinner = (Spinner) findViewById(R.id.ticketAmountPicker);
+        buySpinner          = findViewById(R.id.buySpinner);
+        carTypeSpinner      = findViewById(R.id.carTypeSpinner);
+        trainTypesSpinner   = findViewById(R.id.trainTypeSpinner);
+        ticketTypeSpinner   = findViewById(R.id.ticketTypeSpinner);
+        placesAmountSpinner = findViewById(R.id.ticketAmountPicker);
 
 
         buySpinner.setAdapter(new ArrayAdapter<>(getApplicationContext(), android.R.layout.simple_spinner_item, operationTypes));
@@ -234,8 +233,6 @@ public class MainActivity extends Activity {
             public void onClick(View v) {
                 name = nameEditText.getText().toString();
                 surname = surnameEditText.getText().toString();
-                UZRequests.getInstance().setCurrentStationFromId(stationFromId);
-                UZRequests.getInstance().setCurrentStationTillId(stationToId);
                 start();
             }
         });
@@ -255,8 +252,8 @@ public class MainActivity extends Activity {
             }
         });
 
-        StationAutoCompleteAdapter adapter = new StationAutoCompleteAdapter(getApplicationContext());
-        StationAutoCompleteAdapter adapter2 = new StationAutoCompleteAdapter(getApplicationContext());
+        AdapterStationAutoComplete adapter = new AdapterStationAutoComplete(getApplicationContext());
+        AdapterStationAutoComplete adapter2 = new AdapterStationAutoComplete(getApplicationContext());
 
         stationFromEdit.setAdapter(adapter);
         stationFromEdit.setLoadingIndicator((ProgressBar) findViewById(R.id.progress_bar));
@@ -309,7 +306,7 @@ public class MainActivity extends Activity {
         });
 
         stationToEdit.setAdapter(adapter2);
-        stationToEdit.setLoadingIndicator((ProgressBar) findViewById(R.id.progress_bar2));
+        stationToEdit.setLoadingIndicator(findViewById(R.id.progress_bar2));
         stationToEdit.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
@@ -374,6 +371,7 @@ public class MainActivity extends Activity {
 
     private void initStationFrom(HashMap<String, String> station) {
         stationFromName = station.get("title");
+        TicketDescription.getInstance().setStationFromId(station.get("station_id"));
         stationFromId = station.get("station_id");
         stationFromEdit.setText(stationFromName);
         stationFromEdit.setSelection(stationFromEdit.getText().length());
@@ -381,8 +379,9 @@ public class MainActivity extends Activity {
     }
 
     private void initStationTo(HashMap<String, String> station) {
-        stationToId = station.get("station_id");
         stationToName = station.get("title");
+        TicketDescription.getInstance().setStationToId(station.get("station_id"));
+        stationToId = station.get("station_id");
         stationToEdit.setText(stationToName);
         stationToEdit.setSelection(stationToEdit.getText().length());
         isArrStationCorrect = true;
@@ -393,14 +392,12 @@ public class MainActivity extends Activity {
         if (validate()) {
             String data = MessageFormat.format("{0} {1} {2} {3} {4}",
                     stationFromName,
-                    stationFromId,
+                    TicketDescription.getInstance().getStationFromId(),
                     stationToName,
-                    stationToId,
-                    getDateString());
+                    TicketDescription.getInstance().getStationToId(),
+                    TicketDescription.getInstance().getDepartureDate());
      //       Toast.makeText(getApplicationContext(), data, Toast.LENGTH_LONG).show();
-            String trainData = UZRequests.getInstance().searchForTrains(stationFromId,
-                    stationToId,
-                    date.getTime());
+            String trainData = UZRequests.getInstance().searchForTrains(TicketDescription.getInstance());
             try {
                 JSONObject resp = new JSONObject(trainData).getJSONObject("data");
                 if (resp.has("warning")) {
@@ -454,7 +451,7 @@ public class MainActivity extends Activity {
 
                 }
                 if (corrPlacesTrains.length() > 0) {
-                    Intent intent = new Intent(MainActivity.this, TrainListActivity.class);
+                    Intent intent = new Intent(ActivityMain.this, ActivityTrainList.class);
                     intent.putExtra("trains", corrPlacesTrains.toString());
                     intent.putExtra("name", name);
                     intent.putExtra("surname", surname);
@@ -492,7 +489,7 @@ public class MainActivity extends Activity {
             stationToEdit.requestFocus();
             return false;
         }
-        if (stationFromId.equals(stationToId)) {
+        if (TicketDescription.getInstance().getStationFromId().equals(stationToId)) {
             showErrorMessage(getString(R.string.err_same_stations_head),
                     getString(R.string.err_same_stations_head));
             stationFromEdit.requestFocus();
@@ -515,7 +512,7 @@ public class MainActivity extends Activity {
     }
 
     private void showErrorMessage(String title, String message) {
-        new AlertDialog.Builder(MainActivity.this).setTitle(title)
+        new AlertDialog.Builder(ActivityMain.this).setTitle(title)
                 .setMessage(message)
                 .setCancelable(false)
                 .setNegativeButton("ОК",
@@ -527,7 +524,7 @@ public class MainActivity extends Activity {
     }
 
     private void showTrainOptionsMessage() {
-        AlertDialog dialog = new AlertDialog.Builder(MainActivity.this).setTitle(getString(R.string.no_trains_head))
+        AlertDialog dialog = new AlertDialog.Builder(ActivityMain.this).setTitle(getString(R.string.no_trains_head))
                 .setMessage(getString(R.string.no_trains_body))
                 .setCancelable(false)
                 .setNegativeButton(getString(R.string.no_trains_find_nearest),
@@ -539,7 +536,7 @@ public class MainActivity extends Activity {
                         })
                 .setPositiveButton(getString(R.string.no_trains_show_available), new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        Intent intent = new Intent(MainActivity.this, TrainListActivity.class);
+                        Intent intent = new Intent(ActivityMain.this, ActivityTrainList.class);
                         intent.putExtra("trains", foundData);
                         startActivity(intent);
                         dialog.cancel();
@@ -563,7 +560,7 @@ public class MainActivity extends Activity {
     }
 
     private void showPlacesOptionsMessage() {
-        AlertDialog dialog = new AlertDialog.Builder(MainActivity.this).setTitle(getString(R.string.no_places_head))
+        AlertDialog dialog = new AlertDialog.Builder(ActivityMain.this).setTitle(getString(R.string.no_places_head))
                 .setMessage(getString(R.string.no_places_body))
                 .setCancelable(false)
                 .setNegativeButton(getString(R.string.no_places_find_nearest),
@@ -575,7 +572,7 @@ public class MainActivity extends Activity {
                         })
                 .setPositiveButton(getString(R.string.no_places_show_available), new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        Intent intent = new Intent(MainActivity.this, TrainListActivity.class);
+                        Intent intent = new Intent(ActivityMain.this, ActivityTrainList.class);
                         intent.putExtra("trains", foundData);
                         startActivity(intent);
                         dialog.cancel();
@@ -599,7 +596,7 @@ public class MainActivity extends Activity {
     }
 
     private void showTrainSearchOptionsMessage() {
-        AlertDialog dialog = new AlertDialog.Builder(MainActivity.this).setTitle(getString(R.string.no_avail_trains_head))
+        AlertDialog dialog = new AlertDialog.Builder(ActivityMain.this).setTitle(getString(R.string.no_avail_trains_head))
                 .setMessage(getString(R.string.no_avail_trains_body))
                 .setCancelable(true)
                 .setNegativeButton(getString(R.string.no_avail_trains_find_nearest),
@@ -666,9 +663,7 @@ public class MainActivity extends Activity {
 
         for (int day = 0; day < 45; day++) {
             locCal.add(Calendar.DAY_OF_MONTH, 1);
-            String trainData = UZRequests.getInstance().searchForTrains(stationFromId,
-                    stationToId,
-                    locCal.getTime());
+            String trainData = UZRequests.getInstance().searchForTrains(TicketDescription.getInstance());
             try {
                 JSONObject resp = new JSONObject(trainData);
                 JSONArray corrTrains = new JSONArray();
@@ -712,7 +707,7 @@ public class MainActivity extends Activity {
                     continue;
                 }
 
-                Intent intent = new Intent(MainActivity.this, TrainListActivity.class);
+                Intent intent = new Intent(ActivityMain.this, ActivityTrainList.class);
                 intent.putExtra("trains", corrPlacesTrains.toString());
                 startActivity(intent);
                 break;

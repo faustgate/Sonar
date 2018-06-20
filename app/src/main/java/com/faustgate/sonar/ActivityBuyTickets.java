@@ -8,7 +8,7 @@ import android.webkit.CookieSyncManager;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
-public class BuyTicketActivity extends Activity {
+public class ActivityBuyTickets extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -51,7 +51,7 @@ public class BuyTicketActivity extends Activity {
 
         });
 
-        CookieSyncManager.createInstance(BuyTicketActivity.this);
+        CookieSyncManager.createInstance(ActivityBuyTickets.this);
         CookieManager cookieManager = CookieManager.getInstance();
         cookieManager.removeSessionCookie();
         cookieManager.setCookie(url, sesCookie);

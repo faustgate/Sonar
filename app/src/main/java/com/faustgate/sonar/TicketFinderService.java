@@ -100,9 +100,7 @@ public class TicketFinderService extends Service {
     private class MyTimerTask extends TimerTask {
         @Override
         public void run() {
-            String trainData = UZRequests.getInstance().searchForTrains(stationFromId,
-                    stationToId,
-                    date);
+            String trainData = UZRequests.getInstance().searchForTrains(TicketDescription.getInstance());
             try {
                 JSONObject resp = new JSONObject(trainData);
                 if (resp.getString("error").equals("true") || (!resp.has("value"))) {
@@ -122,7 +120,7 @@ public class TicketFinderService extends Service {
     private void showNotification() {
         PendingIntent resultPendingIntent;
         if (action.equals("no")) {
-            Intent resultIntent = new Intent(this, TrainListActivity.class);
+            Intent resultIntent = new Intent(this, ActivityTrainList.class);
             resultIntent.putExtra("trains", foundData);
             resultPendingIntent =
                     PendingIntent.getActivity(
@@ -132,7 +130,7 @@ public class TicketFinderService extends Service {
                             PendingIntent.FLAG_UPDATE_CURRENT
                     );
         } else {
-            Intent resultIntent = new Intent(this, BuyTicketActivity.class);
+            Intent resultIntent = new Intent(this, ActivityBuyTickets.class);
             resultIntent.putExtra("trains", foundData);
             resultPendingIntent =
                     PendingIntent.getActivity(

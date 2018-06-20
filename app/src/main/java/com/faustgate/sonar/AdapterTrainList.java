@@ -22,12 +22,12 @@ import java.util.List;
  * Created by werwolf on 8/24/16.
  */
 
-public class TrainListAdapter extends BaseAdapter {
+public class AdapterTrainList extends BaseAdapter {
 
     private final Context mContext;
     private JSONArray mObjects;
 
-    public TrainListAdapter(Context context, JSONArray values) {
+    public AdapterTrainList(Context context, JSONArray values) {
         mContext = context;
         mObjects = values;
     }

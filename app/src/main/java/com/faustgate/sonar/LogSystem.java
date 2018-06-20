@@ -11,9 +11,6 @@ import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-/**
- * Created by werwolf on 11/25/16.
- */
 final class LogSystem {
     private static boolean mLoggingEnabled = true;
     private static File logFile = new File(Environment.getExternalStorageDirectory() + "/UKRZaliznitsya/log.log");

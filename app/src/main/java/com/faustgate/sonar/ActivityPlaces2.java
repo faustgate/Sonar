@@ -14,11 +14,10 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 
-public class PlacesActivity2 extends Activity {
+public class ActivityPlaces2 extends Activity {
     private JSONArray car_types;
     private ArrayAdapter<String> adapter;
     private ArrayList<HashMap<String, String>> placesDescription = new ArrayList<>();
@@ -56,7 +55,7 @@ public class PlacesActivity2 extends Activity {
 
         Map<String, String>[] place_map;
 
-        PlaceListAdapter placeListAdapter = new PlaceListAdapter(getApplicationContext(), placesDescription);
+        AdapterPlaceList placeListAdapter = new AdapterPlaceList(getApplicationContext(), placesDescription);
         ListView lv = (ListView) findViewById(R.id.place_list);
 
         lv.setAdapter(placeListAdapter);
@@ -236,7 +235,7 @@ public class PlacesActivity2 extends Activity {
 
                     String ticketsData = UZRequests.getInstance().buyTickets(placesDescription);
                     placesDescription.clear();
-                    Intent intent = new Intent(PlacesActivity2.this, BuyTicketActivity.class);
+                    Intent intent = new Intent(ActivityPlaces2.this, ActivityBuyTickets.class);
                     startActivity(intent);
                 }
             });

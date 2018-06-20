@@ -10,7 +10,6 @@ import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -18,7 +17,7 @@ import java.util.concurrent.ExecutionException;
 
 class UZRequests {
     private static UZRequests mInstance = null;
-    private Context mContext = null;
+    private Context mContext = ApplicationSonar.getContext();
     private Map<String, String> headers = new HashMap<>();
     private Map<String, String> formData = new HashMap<>();
     private Map<String, List<String>> lastHeaders;
@@ -47,15 +46,6 @@ class UZRequests {
         headers.put("Referer", "http://booking.uz.gov.ua");
         headers.put("User-Agent", "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 " +
                 "(KHTML, like Gecko) Chrome/52.0.2743.82 Safari/537.36");
-    }
-
-
-    static UZRequests getInstance(Context context) {
-        if (mInstance == null) {
-            mInstance = new UZRequests();
-        }
-        mInstance.setContext(context);
-        return mInstance;
     }
 
     static UZRequests getInstance() {
@@ -98,15 +88,16 @@ class UZRequests {
         return stations;
     }
 
-    String searchForTrains(String station_from_id, String station_to_id, Date date) {
+    String searchForTrains(TicketDescription ticketDescription) {
         initFormData();
 
-        String strDateDep = new SimpleDateFormat(mContext.getString(R.string.date_format)).format(date.getTime());
+        String strDateDep = ticketDescription.getDepartureDate();
+        String stationFromId = ticketDescription.getStationFromId();
+        String stationToId = ticketDescription.getStationToId();
 
-        if (!station_from_id.equals(lastFromStationId) || !station_to_id.equals(lastTillStationId) || !strDateDep.equals(lastDepDate)) {
-            dateDep = date;
-            formData.put("from", station_from_id);
-            formData.put("to", station_to_id);
+        if (!stationFromId.equals(lastFromStationId) || !stationToId.equals(lastTillStationId) || !strDateDep.equals(lastDepDate)) {
+            formData.put("from", stationFromId);
+            formData.put("to", stationToId);
             formData.put("date", strDateDep);
             formData.put("time", "00:00");
             // formData.put("get_tpl", "1");
@@ -119,8 +110,8 @@ class UZRequests {
                 e.printStackTrace();
             }
             lastDepDate = strDateDep;
-            lastFromStationId = station_from_id;
-            lastTillStationId = station_to_id;
+            lastFromStationId = stationFromId;
+            lastTillStationId = stationToId;
         }
         return lastTrainsInfo;
     }

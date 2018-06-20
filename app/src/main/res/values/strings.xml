@@ -31,10 +31,21 @@
     <string name="modify_search">Modify search</string>
     <string name="monitor_settings_head">Monitor settings</string>
     <string name="name">Name</string>
+
+
     <string name="no_avail_trains_body">No available trains at selected date, please select action:</string>
     <string name="no_avail_trains_enable_monitor">Turn on monitor and wait \n for available tickets</string>
     <string name="no_avail_trains_find_nearest">Find nearest date with \n available trains</string>
     <string name="no_avail_trains_head">No trains was found</string>
+
+
+    <string name="no_places_train_body">No available places in selected train at selected date, please select action:</string>
+    <string name="no_places_train_enable_monitor">Turn on monitor and wait \n for available tickets</string>
+    <string name="no_places_train_find_nearest">Find nearest date with \n available places</string>
+    <string name="no_places_train_head">No places in selected train</string>
+
+
+
     <string name="no_places_body">No such place type in selected date. but other types are present, please select action</string>
     <string name="no_places_find_nearest">Find nearest date with such place types</string>
     <string name="no_places_head">No places was found</string>

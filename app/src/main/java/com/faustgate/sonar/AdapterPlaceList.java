@@ -13,12 +13,12 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
-class PlaceListAdapter extends BaseAdapter {
+class AdapterPlaceList extends BaseAdapter {
 
     private final Context mContext;
     private List<HashMap<String, String>> mObjects;
 
-    PlaceListAdapter(Context context, List<HashMap<String, String>> values) {
+    AdapterPlaceList(Context context, List<HashMap<String, String>> values) {
         mContext = context;
         mObjects = values;
     }

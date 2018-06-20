@@ -1,22 +1,25 @@
 package com.faustgate.sonar;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.TypedValue;
 import android.view.Menu;
 import android.view.View;
 import android.widget.*;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.text.MessageFormat;
 
-public class TrainListActivity extends Activity {
+public class ActivityTrainList extends Activity {
     private JSONObject obj = null;
     private JSONArray foundTrains;
     private JSONArray targetTrains = new JSONArray();
-    private CheckBox cb_showTrainsWithoutPlaces;
     private boolean showTrainsWithoutPlaces;
     private String name;
     private String surname;
@@ -48,7 +51,7 @@ public class TrainListActivity extends Activity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_train_list, menu);
-        cb_showTrainsWithoutPlaces = (CheckBox) menu.findItem(R.id.switchId).getActionView().findViewById(R.id.switchTrainsWOPlaces);
+        CheckBox cb_showTrainsWithoutPlaces = menu.findItem(R.id.switchId).getActionView().findViewById(R.id.switchTrainsWOPlaces);
         showTrainsWithoutPlaces = cb_showTrainsWithoutPlaces.isChecked();
         cb_showTrainsWithoutPlaces.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -62,7 +65,7 @@ public class TrainListActivity extends Activity {
     }
 
 
-    private void genList(){
+    private void genList() {
         targetTrains = new JSONArray();
         try {
             if (showTrainsWithoutPlaces) {
@@ -79,7 +82,7 @@ public class TrainListActivity extends Activity {
             return;
         }
 
-        TrainListAdapter trainAdapter = new TrainListAdapter(getApplicationContext(), targetTrains);
+        AdapterTrainList trainAdapter = new AdapterTrainList(getApplicationContext(), targetTrains);
 
 
         ListView lv = (ListView) findViewById(R.id.listView);
@@ -88,16 +91,24 @@ public class TrainListActivity extends Activity {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
                 try {
+
                     String data = MessageFormat.format("{0} {1}", position, id);
                     Toast.makeText(getApplicationContext(), data, Toast.LENGTH_LONG).show();
-                    String curTrain = targetTrains.getJSONObject(position).toString();
 
-                    Intent intent = new Intent(TrainListActivity.this, CoachListActivity.class);
-                    intent.putExtra("train", curTrain);
-                    intent.putExtra("name", name);
-                    intent.putExtra("surname", surname);
+                    JSONObject selectedTrain = targetTrains.getJSONObject(position);
 
-                    startActivity(intent);
+                    if (selectedTrain.getJSONArray("types").length() == 0) {
+                        String boo = "boo";
+                    } else {
+                        String curTrain = selectedTrain.toString();
+
+                        Intent intent = new Intent(ActivityTrainList.this, ActivityCoachList.class);
+                        intent.putExtra("train", curTrain);
+                        intent.putExtra("name", name);
+                        intent.putExtra("surname", surname);
+
+                        startActivity(intent);
+                    }
 
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -105,4 +116,43 @@ public class TrainListActivity extends Activity {
             }
         });
     }
+
+
+//    private void showTrainSearchOptionsMessage() {
+//        AlertDialog dialog = new AlertDialog.Builder(this).setTitle(getString(R.string.no_places_train_head))
+//                .setMessage(getString(R.string.no_places_train_body))
+//                .setCancelable(true)
+//                .setNegativeButton(getString(R.string.no_places_train_find_nearest),
+//                        new DialogInterface.OnClickListener() {
+//                            public void onClick(DialogInterface dialog, int id) {
+//                                findNearestTrainsWithPlaces();
+//                                dialog.cancel();
+//                            }
+//                        })
+//                .setPositiveButton(getString(R.string.no_avail_trains_enable_monitor),
+//                        new DialogInterface.OnClickListener() {
+//                            public void onClick(DialogInterface dialog, int id) {
+//                                activateMonitor();
+//                                dialog.cancel();
+//                            }
+//                        })
+//                .setNeutralButton(getString(R.string.modify_search), new DialogInterface.OnClickListener() {
+//                    public void onClick(DialogInterface dialog, int id) {
+//                        dialog.cancel();
+//                    }
+//                }).create();
+//
+//        dialog.show();
+//        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setLines(4);
+//        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextSize(TypedValue.COMPLEX_UNIT_PX, 20.0f);
+//
+//        dialog.getButton(AlertDialog.BUTTON_NEUTRAL).setLines(4);
+//        dialog.getButton(AlertDialog.BUTTON_NEUTRAL).setTextSize(TypedValue.COMPLEX_UNIT_PX, 20.0f);
+//
+//        dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setLines(4);
+//        dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextSize(TypedValue.COMPLEX_UNIT_PX, 20.0f);
+//    }
+
+
+
 }

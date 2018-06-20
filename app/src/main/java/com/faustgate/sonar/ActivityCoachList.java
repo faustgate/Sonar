@@ -17,7 +17,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
-public class CoachListActivity extends Activity {
+public class ActivityCoachList extends Activity {
     private JSONArray car_types;
     private ArrayAdapter<String> adapter;
     private ArrayList<HashMap<String, String>> placesDescription = new ArrayList<>();
@@ -110,14 +110,14 @@ public class CoachListActivity extends Activity {
                 }
             });
             ListView lv = (ListView) findViewById(R.id.listView);
-            CoachListAdapter carAdapter = new CoachListAdapter(getApplicationContext(), carDescriptions);
+            AdapterCoachList carAdapter = new AdapterCoachList(getApplicationContext(), carDescriptions);
             lv.setAdapter(carAdapter);
 
             lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-                    Intent intent = new Intent(CoachListActivity.this, PlacesActivity2.class);
+                    Intent intent = new Intent(ActivityCoachList.this, ActivityPlaces2.class);
 
                     intent.putExtra("dat", new JSONObject(carDescriptions.get(position)).toString());
                     try {

@@ -14,7 +14,7 @@ import java.util.List;
  * Created by werwolf on 8/24/16.
  */
 
-class StationAutoCompleteAdapter extends BaseAdapter implements Filterable {
+class AdapterStationAutoComplete extends BaseAdapter implements Filterable {
 
     private static final int MAX_RESULTS = 10;
 
@@ -22,11 +22,9 @@ class StationAutoCompleteAdapter extends BaseAdapter implements Filterable {
     private List<String> mResults;
     private ArrayList<String> names = new ArrayList<>();
     private List<HashMap<String, String>> stations = new ArrayList<>();
-    private UZRequests uzr;
 
-    StationAutoCompleteAdapter(Context context) {
+    AdapterStationAutoComplete(Context context) {
         mContext = context;
-        uzr = UZRequests.getInstance(mContext);
         mResults = new ArrayList<>();
     }
 
@@ -99,7 +97,7 @@ class StationAutoCompleteAdapter extends BaseAdapter implements Filterable {
         List<HashMap<String, String>> stations;
         names.clear();
         try {
-            stations = uzr.getStationsInfo(stationName);
+            stations = UZRequests.getInstance().getStationsInfo(stationName);
             if (stations.size() == 0) {
                 Toast da = Toast.makeText(mContext, mContext.getString(R.string.no_stations_found), Toast.LENGTH_SHORT);
                 da.show();

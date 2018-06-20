@@ -18,7 +18,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
-public class PlacesActivity extends Activity {
+public class ActivityPlaces extends Activity {
     private JSONArray car_types;
     private ArrayAdapter<String> adapter;
     private ArrayList<HashMap<String, String>> placesDescription = new ArrayList<>();
@@ -183,7 +183,7 @@ public class PlacesActivity extends Activity {
                     placesDescription.add(currentTicketDescription);
                     String ticketsData = UZRequests.getInstance().buyTickets(placesDescription);
                     placesDescription.clear();
-                    Intent intent = new Intent(PlacesActivity.this, BuyTicketActivity.class);
+                    Intent intent = new Intent(ActivityPlaces.this, ActivityBuyTickets.class);
                     startActivity(intent);
                 }
             });
