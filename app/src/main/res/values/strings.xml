@@ -45,7 +45,6 @@
     <string name="no_places_train_head">No places in selected train</string>
 
 
-
     <string name="no_places_body">No such place type in selected date. but other types are present, please select action</string>
     <string name="no_places_find_nearest">Find nearest date with such place types</string>
     <string name="no_places_head">No places was found</string>
@@ -86,4 +85,5 @@
     <string name="train">Train</string>
     <string name="show_trains_wo_places">Show trains without places</string>
     <string name="pay">Pay</string>
+    <string name="title_activity_start">ActivityStart</string>
 </resources>
