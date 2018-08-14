@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_height="wrap_content"
+    android:layout_width="match_parent"
+    android:background="#fff">
+
+
+    <LinearLayout
+        android:layout_width="50dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="#000"
+        android:paddingTop="0.5dp"
+        android:paddingBottom="0.5dp"
+        android:layout_marginRight="0.5dp">
+
+        <TextView
+            android:text="@string/train"
+            android:layout_height="match_parent"
+            android:layout_width="match_parent"
+            android:gravity="center"
+            android:id="@+id/train_head" />
+
+        <TextView
+            android:text=""
+            android:layout_height="match_parent"
+            android:layout_width="match_parent"
+            android:gravity="center"
+            android:id="@+id/train_placeholder"
+            />
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginBottom="0.5dp">
+
+        <TextView
+            android:text="@string/dep"
+            android:layout_height="match_parent"
+            android:layout_width="match_parent"
+            android:gravity="center"
+            android:id="@+id/dep_head"
+            android:layout_marginBottom="0.5dp"
+            android:background="#000"/>
+
+        <TextView
+            android:layout_marginBottom="0.5dp"
+            android:background="#000"
+            android:text="@string/arr"
+            android:layout_height="match_parent"
+            android:layout_width="match_parent"
+            android:gravity="center"
+            android:id="@+id/arr_head"
+            />
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_marginBottom="0.5dp"
+            android:layout_marginRight="0.5dp"
+            android:background="#000"
+            android:text=""
+            android:layout_height="match_parent"
+            android:layout_width="match_parent"
+            android:gravity="start"
+            android:id="@+id/dep_placeholder" />
+
+        <TextView
+            android:layout_marginBottom="0.5dp"
+            android:layout_marginRight="0.5dp"
+            android:background="#000"
+            android:text=""
+            android:layout_height="match_parent"
+            android:layout_width="match_parent"
+            android:gravity="start"
+            android:id="@+id/arr_placeholder"
+            />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_marginBottom="0.5dp"
+
+            android:background="#000"
+            android:text="@string/wagon"
+            android:layout_height="match_parent"
+            android:layout_width="match_parent"
+            android:gravity="end"
+            android:id="@+id/car_head" />
+
+        <TextView
+            android:layout_marginBottom="0.5dp"
+            android:background="#000"
+            android:text="@string/place"
+            android:layout_height="match_parent"
+            android:layout_width="match_parent"
+            android:gravity="center"
+            android:id="@+id/place_head" />
+
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_marginBottom="0.5dp"
+            android:layout_marginRight="0.5dp"
+            android:background="#000"
+            android:text=""
+            android:layout_height="match_parent"
+            android:layout_width="match_parent"
+            android:gravity="center"
+            android:id="@+id/car_placeholder"
+            />
+
+        <TextView
+            android:layout_marginBottom="0.5dp"
+            android:layout_marginRight="0.5dp"
+            android:background="#000"
+            android:text=""
+            android:layout_height="match_parent"
+            android:layout_width="match_parent"
+            android:gravity="center"
+            android:id="@+id/place_placeholder"
+            />
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:layout_width="50dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="#000"
+        android:paddingBottom="3.0dp"
+        android:layout_marginRight="0.5dp"
+        android:layout_weight="1">
+
+        <TextView
+            android:text="@string/services"
+            android:layout_height="match_parent"
+            android:layout_width="match_parent"
+            android:gravity="center"
+            android:id="@+id/services_head" />
+
+        <TextView
+            android:textSize="11dp"
+            android:text=""
+            android:layout_height="match_parent"
+            android:layout_width="match_parent"
+            android:gravity="center"
+            android:id="@+id/services_placeholder"            />
+    </LinearLayout>
+
+
+
+    <LinearLayout
+        android:layout_width="50dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="#000"
+        android:paddingBottom="0.5dp"
+        android:layout_marginRight="1dp">
+
+        <TextView
+            android:text="@string/price"
+            android:layout_height="match_parent"
+            android:layout_width="match_parent"
+            android:gravity="center"
+            android:id="@+id/price_head" />
+
+        <TextView
+            android:text=""
+            android:layout_height="match_parent"
+            android:layout_width="match_parent"
+            android:gravity="center"
+            android:id="@+id/price_placeholder" />
+    </LinearLayout>
+
+
+
+</LinearLayout>

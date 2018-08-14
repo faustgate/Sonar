@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="all">All</string>
+    <string name="app_name">Sonar</string>
+    <string name="arr">Arr.:</string>
+    <string name="base_url">https://booking.uz.gov.ua/en/</string>
+    <string name="cart_address">/en/mobile/cart/</string>
+    <string name="date_format">yyyy-MM-dd</string>
+    <string name="dep">Dep.:</string>
+    <string name="err_fill_name_body">Please fill in name</string>
+    <string name="err_fill_name_head">Empty name!</string>
+    <string name="err_fill_surname_body">Please fill in surname</string>
+    <string name="err_fill_surname_head">Empty surname!</string>
+    <string name="err_same_stations_body">Arrival and departure stations are the same</string>
+    <string name="err_same_stations_head">Same stations!</string>
+    <string name="err_wrong_arr_station_body">Arrival station wrong or empty</string>
+    <string name="err_wrong_arr_station_head">Wrong arrival station!</string>
+    <string name="err_wrong_dep_station_body">Departure station wrong or empty</string>
+    <string name="err_wrong_dep_station_head">Wrong departure station!</string>
+    <string name="found_tickets_actions_book">Book (15 min)</string>
+    <string name="found_tickets_actions_book_cont">Book and keep</string>
+    <string name="found_tickets_actions_header">Action when find tickets</string>
+    <string name="found_tickets_actions_no">No action</string>
+    <string name="found_tickets_notifications_header">Notification when find tickets</string>
+    <string name="found_tickets_notifications_long">Statusbar + sound and vibro till reaction</string>
+    <string name="found_tickets_notifications_short">Statusbar + short sound and vibro</string>
+    <string name="found_tickets_notifications_statbar">Statusbar silently</string>
+    <string name="from">From</string>
+    <string name="ic_class1">С1</string>
+    <string name="ic_class2">C2</string>
+    <string name="modify_search">Modify search</string>
+    <string name="monitor_settings_head">Monitor settings</string>
+    <string name="name">Name</string>
+
+
+    <string name="no_avail_trains_body">No available trains at selected date, please select action:</string>
+    <string name="no_avail_trains_enable_monitor">Turn on monitor and wait \n for available tickets</string>
+    <string name="no_avail_trains_find_nearest">Find nearest date with \n available trains</string>
+    <string name="no_avail_trains_head">No trains was found</string>
+
+
+    <string name="no_places_train_body">No available places in selected train at selected date, please select action:</string>
+    <string name="no_places_train_enable_monitor">Turn on monitor and wait \n for available tickets</string>
+    <string name="no_places_train_find_nearest">Find nearest date with \n available places</string>
+    <string name="no_places_train_head">No places in selected train</string>
+
+
+    <string name="no_places_body">No such place type in selected date. but other types are present, please select action</string>
+    <string name="no_places_find_nearest">Find nearest date with such place types</string>
+    <string name="no_places_head">No places was found</string>
+    <string name="no_places_show_available">Show available places on selected date</string>
+    <string name="no_stations_found">No stations were found by given criteria\n(or there are troubles with Internet access)</string>
+    <string name="no_trains_body">No such train type in selected date. but other types are present, please select action</string>
+    <string name="no_trains_find_nearest">Find nearest date with such train types</string>
+    <string name="no_trains_head">No trains was found</string>
+    <string name="no_trains_show_available">Show available trains on selected date</string>
+    <string name="operation">Operation:</string>
+    <string name="operation_booking">Booking</string>
+    <string name="operation_buying">Buying</string>
+    <string name="place_type">Place type:</string>
+    <string name="search">Search</string>
+    <string name="select_car">Select car</string>
+    <string name="select_place">Select place</string>
+    <string name="select_place_type">Select class</string>
+    <string name="start">Start</string>
+    <string name="surname">Surname</string>
+    <string name="ticket_amount">Ticket amount:</string>
+    <string name="ticket_child">Child</string>
+    <string name="ticket_stud">Student</string>
+    <string name="ticket_type">Ticket Type:</string>
+    <string name="ticket_usual">Usual</string>
+    <string name="to">To</string>
+    <string name="train_class1">Suite / first-class sleeper</string>
+    <string name="train_class2">Coupe / coach with compartments</string>
+    <string name="train_class3">Berth / third-class sleeper</string>
+    <string name="train_ic">Intercity</string>
+    <string name="train_type">Train type:</string>
+    <string name="train_usual">Usual</string>
+    <string name="user_date_format">EE, MMM dd, yyyy</string>
+    <string name="place_count_header">Places:</string>
+    <string name="wagon">Wagon</string>
+    <string name="place">Place</string>
+    <string name="services">Services</string>
+    <string name="price">Price</string>
+    <string name="train">Train</string>
+    <string name="show_trains_wo_places">Show trains without places</string>
+    <string name="add_to_cart">Add to cart</string>
+    <string name="title_activity_start">ActivityStart</string>
+</resources>

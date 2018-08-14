@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_height="60dp"
+    android:layout_width="match_parent"
+    android:paddingLeft="10dp"
+    android:paddingRight="10dp">
+
+    <TextView
+        android:text=""
+        android:layout_height="match_parent"
+        android:layout_width="wrap_content"
+        android:gravity="center"
+        android:id="@+id/train_num" />
+
+    <LinearLayout
+        android:layout_weight="1"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <TextView
+            android:paddingTop="5dp"
+            android:layout_weight="1"
+            android:layout_height="match_parent"
+            android:layout_width="match_parent"
+            android:text=""
+            android:id="@+id/train_direction"
+            android:gravity="center" />
+
+        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            android:orientation="horizontal"
+            android:layout_height="match_parent"
+            android:layout_width="match_parent"
+            android:layout_weight="1"
+            android:paddingBottom="5dp">
+
+            <TextView
+                android:layout_height="match_parent"
+                android:layout_width="match_parent"
+                android:text="@string/dep"
+                android:gravity="center"
+                android:layout_weight="1"
+                android:id="@+id/train_dep_date_header" />
+
+            <TextView
+                android:layout_weight="0.9"
+                android:layout_height="match_parent"
+                android:layout_width="fill_parent"
+                android:text=""
+                android:gravity="center|start"
+                android:id="@+id/train_dep_date_field"
+                android:textSize="10dp" />
+
+            <TextView
+                android:layout_weight="1"
+                android:layout_height="match_parent"
+                android:layout_width="match_parent"
+                android:text="@string/arr"
+                android:gravity="center"
+                android:id="@+id/train_arr_date_header" />
+
+            <TextView
+                android:layout_weight="0.9"
+                android:layout_height="match_parent"
+                android:layout_width="match_parent"
+                android:text=""
+                android:id="@+id/train_arr_date_field"
+                android:gravity="center|start"
+                android:textSize="10dp" />
+
+
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_height="match_parent"
+        android:layout_width="wrap_content"
+        android:id="@+id/places_placeholder">
+
+    </LinearLayout>
+</LinearLayout>
