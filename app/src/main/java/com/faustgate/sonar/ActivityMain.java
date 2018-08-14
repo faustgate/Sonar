@@ -3,20 +3,15 @@ package com.faustgate.sonar;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
-import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.TypedValue;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.*;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
@@ -37,14 +32,9 @@ public class ActivityMain extends Activity {
     private boolean isDepStationCorrect = false;
     private boolean isArrStationCorrect = false;
     private DelayAutoCompleteTextView stationFromEdit, stationToEdit;
-    private Map<String, String> targetTicketDescription = new HashMap<>();
-    private String foundData;
-    private String action = "no";
-    private String name = "";
-    private String surname = "";
-    private String notification = "statbar";
     private String ticketType;
     private boolean isBuying;
+    private OrderDescription currentTicket = OrderDescription.getInstance();
 
 
     private DatePickerDialog.OnDateSetListener dateSetListener = new DatePickerDialog.OnDateSetListener() {
@@ -63,7 +53,7 @@ public class ActivityMain extends Activity {
                 buySpinner.setEnabled(false);
             }
 
-            TicketDescription.getInstance().setDepartureDate(date.getTime());
+            OrderDescription.getInstance().setDepartureDate(date.getTime());
             updateLabel();
         }
     };
@@ -72,13 +62,13 @@ public class ActivityMain extends Activity {
         public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
             switch (position) {
                 case 0:
-                    targetTicketDescription.put("carType", "");
+                    currentTicket.setWagonType("all");
                     break;
                 case 1:
-                    targetTicketDescription.put("carType", "С1");
+                    currentTicket.setWagonType("С1");
                     break;
                 case 2:
-                    targetTicketDescription.put("carType", "С2");
+                    currentTicket.setWagonType("С2");
                     break;
             }
 
@@ -94,16 +84,16 @@ public class ActivityMain extends Activity {
         public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
             switch (position) {
                 case 0:
-                    targetTicketDescription.put("carType", "");
+                    currentTicket.setWagonType("all");
                     break;
                 case 1:
-                    targetTicketDescription.put("carType", "П");
+                    currentTicket.setWagonType("П");
                     break;
                 case 2:
-                    targetTicketDescription.put("carType", "К");
+                    currentTicket.setWagonType("К");
                     break;
                 case 3:
-                    targetTicketDescription.put("carType", "Л");
+                    currentTicket.setWagonType("Л");
                     break;
             }
 
@@ -118,6 +108,7 @@ public class ActivityMain extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
         boolean isDebuggable = (0 != (getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE));
@@ -177,20 +168,20 @@ public class ActivityMain extends Activity {
                 switch (position) {
                     case 0:
                         carTypeSpinner.setAdapter(new ArrayAdapter<>(getApplicationContext(), android.R.layout.simple_spinner_item, usualTrainTypes));
-                        targetTicketDescription.put("trainType", "");
-                        targetTicketDescription.put("carType", "");
+                        currentTicket.setTrainType("all");
+                        currentTicket.setTicketType("all");
                         carTypeSpinner.setOnItemSelectedListener(usualСarTypesClickListener);
                         carTypeSpinner.setEnabled(false);
                         break;
                     case 1:
                         carTypeSpinner.setAdapter(new ArrayAdapter<>(getApplicationContext(), android.R.layout.simple_spinner_item, usualTrainTypes));
-                        targetTicketDescription.put("trainType", "0");
+                        currentTicket.setTrainType("usual");
                         carTypeSpinner.setOnItemSelectedListener(usualСarTypesClickListener);
                         carTypeSpinner.setEnabled(true);
                         break;
                     case 2:
                         carTypeSpinner.setAdapter(new ArrayAdapter<>(getApplicationContext(), android.R.layout.simple_spinner_item, ICCarTypes));
-                        targetTicketDescription.put("trainType", "1");
+                        currentTicket.setTrainType("IC");
                         carTypeSpinner.setOnItemSelectedListener(ICCarTypesClickListener);
                         carTypeSpinner.setEnabled(true);
                         break;
@@ -231,8 +222,8 @@ public class ActivityMain extends Activity {
         search.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                name = nameEditText.getText().toString();
-                surname = surnameEditText.getText().toString();
+                currentTicket.setName(nameEditText.getText().toString());
+                currentTicket.setSurname(surnameEditText.getText().toString());
                 start();
             }
         });
@@ -371,7 +362,7 @@ public class ActivityMain extends Activity {
 
     private void initStationFrom(HashMap<String, String> station) {
         stationFromName = station.get("title");
-        TicketDescription.getInstance().setStationFromId(station.get("station_id"));
+        currentTicket.setStationFromId(station.get("station_id"));
         stationFromId = station.get("station_id");
         stationFromEdit.setText(stationFromName);
         stationFromEdit.setSelection(stationFromEdit.getText().length());
@@ -380,7 +371,7 @@ public class ActivityMain extends Activity {
 
     private void initStationTo(HashMap<String, String> station) {
         stationToName = station.get("title");
-        TicketDescription.getInstance().setStationToId(station.get("station_id"));
+        currentTicket.setStationToId(station.get("station_id"));
         stationToId = station.get("station_id");
         stationToEdit.setText(stationToName);
         stationToEdit.setSelection(stationToEdit.getText().length());
@@ -392,78 +383,16 @@ public class ActivityMain extends Activity {
         if (validate()) {
             String data = MessageFormat.format("{0} {1} {2} {3} {4}",
                     stationFromName,
-                    TicketDescription.getInstance().getStationFromId(),
+                    OrderDescription.getInstance().getStationFromId(),
                     stationToName,
-                    TicketDescription.getInstance().getStationToId(),
-                    TicketDescription.getInstance().getDepartureDate());
-     //       Toast.makeText(getApplicationContext(), data, Toast.LENGTH_LONG).show();
-            String trainData = UZRequests.getInstance().searchForTrains(TicketDescription.getInstance());
-            try {
-                JSONObject resp = new JSONObject(trainData).getJSONObject("data");
-                if (resp.has("warning")) {
-                    if (resp.getString("warning").contains("No places")) {
-                        showTrainSearchOptionsMessage();
-                        return;
-                    }
-                }
+                    OrderDescription.getInstance().getStationToId(),
+                    OrderDescription.getInstance().getDepartureDate());
+            //       Toast.makeText(getApplicationContext(), data, Toast.LENGTH_LONG).show();
 
-                JSONArray corrTrains = new JSONArray();
-                JSONArray corrPlacesTrains = new JSONArray();
-
-
-                if (!resp.has("list")) {
-                    return;
-                }
-                JSONArray trains = resp.getJSONArray("list");
-                if (targetTicketDescription.get("trainType").equals("")) {
-                    corrTrains = trains;
-                } else {
-                    for (int i = 0; i < trains.length(); i++) {
-                        JSONObject train = trains.getJSONObject(i);
-                        if (targetTicketDescription.get("trainType").contains(train.getString("category")))
-                            corrTrains.put(train);
-                    }
-                }
-
-                if (corrTrains.length() == 0) {
-                    foundData = trains.toString();
-                    showTrainOptionsMessage();
-                }
-
-
-                if (targetTicketDescription.get("carType").equals("")) {
-                    corrPlacesTrains = corrTrains;
-                } else {
-                    for (int j = 0; j < corrTrains.length(); j++) {
-                        JSONObject train = corrTrains.getJSONObject(j);
-                        JSONArray types = train.getJSONArray("types");
-                        for (int k = 0; k < types.length(); k++) {
-                            String typeId = types.getJSONObject(k).getString("letter");
-                            if (targetTicketDescription.get("carType").contains(typeId))
-                                corrPlacesTrains.put(train);
-                        }
-                    }
-
-                    if (corrPlacesTrains.length() == 0) {
-                        foundData = corrTrains.toString();
-                        showPlacesOptionsMessage();
-                    }
-
-                }
-                if (corrPlacesTrains.length() > 0) {
-                    Intent intent = new Intent(ActivityMain.this, ActivityTrainList.class);
-                    intent.putExtra("trains", corrPlacesTrains.toString());
-                    intent.putExtra("name", name);
-                    intent.putExtra("surname", surname);
-                    startActivity(intent);
-                }
-            } catch (JSONException e) {
-                Toast.makeText(getApplicationContext(), "Unknown Error", Toast.LENGTH_SHORT).show();
-                e.printStackTrace();
-            }
-
-
+            Intent intent = new Intent(ActivityMain.this, ActivityTrainList.class);
+            startActivity(intent);
         }
+
     }
 
     private void updateLabel() {
@@ -489,7 +418,7 @@ public class ActivityMain extends Activity {
             stationToEdit.requestFocus();
             return false;
         }
-        if (TicketDescription.getInstance().getStationFromId().equals(stationToId)) {
+        if (currentTicket.getStationFromId().equals(stationToId)) {
             showErrorMessage(getString(R.string.err_same_stations_head),
                     getString(R.string.err_same_stations_head));
             stationFromEdit.requestFocus();
@@ -523,113 +452,6 @@ public class ActivityMain extends Activity {
                         }).show();
     }
 
-    private void showTrainOptionsMessage() {
-        AlertDialog dialog = new AlertDialog.Builder(ActivityMain.this).setTitle(getString(R.string.no_trains_head))
-                .setMessage(getString(R.string.no_trains_body))
-                .setCancelable(false)
-                .setNegativeButton(getString(R.string.no_trains_find_nearest),
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
-                                findNearestTrainsWithPlaces();
-                                dialog.cancel();
-                            }
-                        })
-                .setPositiveButton(getString(R.string.no_trains_show_available), new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        Intent intent = new Intent(ActivityMain.this, ActivityTrainList.class);
-                        intent.putExtra("trains", foundData);
-                        startActivity(intent);
-                        dialog.cancel();
-                    }
-                })
-                .setNeutralButton(getString(R.string.modify_search), new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        dialog.cancel();
-                    }
-                }).create();
-
-        dialog.show();
-        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setLines(4);
-        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextSize(TypedValue.COMPLEX_UNIT_PX, 20.0f);
-
-        dialog.getButton(AlertDialog.BUTTON_NEUTRAL).setLines(4);
-        dialog.getButton(AlertDialog.BUTTON_NEUTRAL).setTextSize(TypedValue.COMPLEX_UNIT_PX, 20.0f);
-
-        dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setLines(4);
-        dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextSize(TypedValue.COMPLEX_UNIT_PX, 20.0f);
-    }
-
-    private void showPlacesOptionsMessage() {
-        AlertDialog dialog = new AlertDialog.Builder(ActivityMain.this).setTitle(getString(R.string.no_places_head))
-                .setMessage(getString(R.string.no_places_body))
-                .setCancelable(false)
-                .setNegativeButton(getString(R.string.no_places_find_nearest),
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
-                                findNearestTrainsWithPlaces();
-                                dialog.cancel();
-                            }
-                        })
-                .setPositiveButton(getString(R.string.no_places_show_available), new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        Intent intent = new Intent(ActivityMain.this, ActivityTrainList.class);
-                        intent.putExtra("trains", foundData);
-                        startActivity(intent);
-                        dialog.cancel();
-                    }
-                })
-                .setNeutralButton(getString(R.string.modify_search), new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        dialog.cancel();
-                    }
-                }).create();
-
-        dialog.show();
-        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setLines(4);
-        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextSize(TypedValue.COMPLEX_UNIT_PX, 20.0f);
-
-        dialog.getButton(AlertDialog.BUTTON_NEUTRAL).setLines(4);
-        dialog.getButton(AlertDialog.BUTTON_NEUTRAL).setTextSize(TypedValue.COMPLEX_UNIT_PX, 20.0f);
-
-        dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setLines(4);
-        dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextSize(TypedValue.COMPLEX_UNIT_PX, 20.0f);
-    }
-
-    private void showTrainSearchOptionsMessage() {
-        AlertDialog dialog = new AlertDialog.Builder(ActivityMain.this).setTitle(getString(R.string.no_avail_trains_head))
-                .setMessage(getString(R.string.no_avail_trains_body))
-                .setCancelable(true)
-                .setNegativeButton(getString(R.string.no_avail_trains_find_nearest),
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
-                                findNearestTrainsWithPlaces();
-                                dialog.cancel();
-                            }
-                        })
-                .setPositiveButton(getString(R.string.no_avail_trains_enable_monitor),
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
-                                activateMonitor();
-                                dialog.cancel();
-                            }
-                        })
-                .setNeutralButton(getString(R.string.modify_search), new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        dialog.cancel();
-                    }
-                }).create();
-
-        dialog.show();
-        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setLines(4);
-        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextSize(TypedValue.COMPLEX_UNIT_PX, 20.0f);
-
-        dialog.getButton(AlertDialog.BUTTON_NEUTRAL).setLines(4);
-        dialog.getButton(AlertDialog.BUTTON_NEUTRAL).setTextSize(TypedValue.COMPLEX_UNIT_PX, 20.0f);
-
-        dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setLines(4);
-        dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextSize(TypedValue.COMPLEX_UNIT_PX, 20.0f);
-    }
-
     private ArrayList<String> initTrainTypes() {
         ArrayList<String> trainTypesLoc = new ArrayList<>();
         trainTypesLoc.add(getString(R.string.all));
@@ -655,149 +477,6 @@ public class ActivityMain extends Activity {
         return usualCarTypes;
     }
 
-    private void findNearestTrainsWithPlaces() {
-        Calendar locCal = Calendar.getInstance();
-        locCal.set(Calendar.YEAR, date.get(Calendar.YEAR));
-        locCal.set(Calendar.MONTH, date.get(Calendar.MONTH));
-        locCal.set(Calendar.DAY_OF_MONTH, date.get(Calendar.DAY_OF_MONTH));
 
-        for (int day = 0; day < 45; day++) {
-            locCal.add(Calendar.DAY_OF_MONTH, 1);
-            String trainData = UZRequests.getInstance().searchForTrains(TicketDescription.getInstance());
-            try {
-                JSONObject resp = new JSONObject(trainData);
-                JSONArray corrTrains = new JSONArray();
-                JSONArray corrPlacesTrains = new JSONArray();
-                if (resp.getString("error").equals("true") || (!resp.has("value"))) {
-                    continue;
-                }
-                JSONArray trains = resp.getJSONArray("value");
-                if (trains.length() == 0) {
-                    continue;
-                }
-                if (targetTicketDescription.get("trainType").equals("")) {
-                    corrTrains = trains;
-                } else {
-                    for (int i = 0; i < trains.length(); i++) {
-                        JSONObject train = trains.getJSONObject(i);
-                        if (targetTicketDescription.get("trainType").contains(train.getString("category")))
-                            corrTrains.put(train);
-                    }
-                }
-
-                if (corrTrains.length() == 0) {
-                    continue;
-                }
-
-                if (targetTicketDescription.get("carType").equals("")) {
-                    corrPlacesTrains = corrTrains;
-                } else {
-                    for (int j = 0; j < corrTrains.length(); j++) {
-                        JSONObject train = corrTrains.getJSONObject(j);
-                        JSONArray types = train.getJSONArray("types");
-                        for (int k = 0; k < types.length(); k++) {
-                            String typeId = types.getJSONObject(k).getString("letter");
-                            if (targetTicketDescription.get("carType").contains(typeId))
-                                corrPlacesTrains.put(train);
-                        }
-                    }
-                }
-
-                if (corrPlacesTrains.length() == 0) {
-                    continue;
-                }
-
-                Intent intent = new Intent(ActivityMain.this, ActivityTrainList.class);
-                intent.putExtra("trains", corrPlacesTrains.toString());
-                startActivity(intent);
-                break;
-
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    private void activateMonitor() {
-        Dialog dialog = new Dialog(this);
-        dialog.setTitle(getString(R.string.monitor_settings_head));
-
-        Intent intent = new Intent(this, TicketFinderService.class);
-        SimpleDateFormat sdf = new SimpleDateFormat("MMMM dd yyyy", Locale.US);
-
-        dialog.setContentView(R.layout.monitor_settings_layout);
-        RadioButton rbNoAct = (RadioButton) dialog.findViewById(R.id.rbNoAction);
-        RadioButton rbBlock1 = (RadioButton) dialog.findViewById(R.id.rbBlockOnce);
-        RadioButton rbBlockCont = (RadioButton) dialog.findViewById(R.id.rbBlockContinuous);
-        RadioButton rbNotifStatBar = (RadioButton) dialog.findViewById(R.id.rbStatusBarNotification);
-        RadioButton rbNotifShort = (RadioButton) dialog.findViewById(R.id.rbShortNotification);
-        RadioButton rbNotifLong = (RadioButton) dialog.findViewById(R.id.rbLongNotification);
-        Button start = (Button) dialog.findViewById(R.id.btnStartMon);
-
-        rbNoAct.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked)
-                    action = "no";
-            }
-        });
-        rbBlock1.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked)
-                    action = "1";
-            }
-        });
-        rbBlockCont.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked)
-                    action = "cont";
-            }
-        });
-
-        rbNotifStatBar.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked)
-                    notification = "statbar";
-            }
-        });
-        rbNotifShort.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked)
-                    notification = "short";
-            }
-        });
-        rbNotifLong.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked)
-                    notification = "long";
-            }
-        });
-
-        start.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                intent.putExtra("stationFromId", stationFromId);
-                intent.putExtra("stationToId", stationToId);
-                intent.putExtra("date", sdf.format(date.getTime()));
-                intent.putExtra("action", action);
-                intent.putExtra("notification", notification);
-                intent.putExtra("ticketType", ticketType);
-                intent.putExtra("buy", isBuying);
-                intent.putExtra("name", name);
-                intent.putExtra("surname", surname);
-                startService(intent);
-                dialog.hide();
-            }
-        });
-
-        dialog.show();
-
-
-    }
 
 }

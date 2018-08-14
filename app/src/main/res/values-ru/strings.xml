@@ -74,5 +74,5 @@
     <string name="train">Поезд</string>
     <string name="wagon">Вагон</string>
     <string name="show_trains_wo_places">Показать поезда без свободных мест</string>
-    <string name="pay">Оплатить</string>
+    <string name="add_to_cart">Добавить в корзину</string>
 </resources>

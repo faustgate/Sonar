@@ -74,5 +74,5 @@
     <string name="price">Ціна</string>
     <string name="place">Місце</string>
     <string name="show_trains_wo_places">Показати поїзди без свободних місць</string>
-    <string name="pay">Оплатити</string>
+    <string name="add_to_cart">Оплатити</string>
 </resources>

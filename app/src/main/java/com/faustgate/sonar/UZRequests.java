@@ -2,6 +2,7 @@ package com.faustgate.sonar;
 
 import android.content.Context;
 import android.os.AsyncTask;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -11,7 +12,6 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.text.MessageFormat;
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 
@@ -23,19 +23,18 @@ class UZRequests {
     private Map<String, List<String>> lastHeaders;
     private List<String> cookies = new ArrayList<>();
     private List<String> ticketFields = Arrays.asList("from", "to", "train", "date", "ord", "charline", "wagon_num",
-                                                      "wagon_class", "wagon_type", "firstname", "lastname", "bedding",
-                                                      "child", "stud", "transportation", "reserve", "place_num");
+            "wagon_class", "wagon_type", "wagon_railway", "firstname", "lastname", "bedding",
+            "child", "student", "reserve", "place_num");
     private List<String> formFields = Arrays.asList("roundtrip");
     private List<JSONObject> lastPlacesInfo = new ArrayList<>();
-  //  private JSONObject lastTr = new ArrayList<>();
-    private String auth_token, reservationId, lastFromStationId, lastTillStationId, lastDepDate,lastTrainsInfo, lastTrainId;
+    //  private JSONObject lastTr = new ArrayList<>();
+    private String auth_token, reservationId, lastFromStationId, lastTillStationId, lastDepDate, lastTrainsInfo, lastTrainId;
     private ArrayList<HashMap<String, String>> ticketsDescriptions;
     private boolean isAuthDataPresent = false;
     private boolean isBuying = false;
     private boolean refreshTokens = true;
     private boolean ticketsFound = false;
     private JSONObject lastTrainInfo;
-
 
 
     private String currentDepDate, currentStationTillId, currentStationFromId;
@@ -88,12 +87,12 @@ class UZRequests {
         return stations;
     }
 
-    String searchForTrains(TicketDescription ticketDescription) {
+    String searchForTrains(OrderDescription orderDescription) {
         initFormData();
 
-        String strDateDep = ticketDescription.getDepartureDate();
-        String stationFromId = ticketDescription.getStationFromId();
-        String stationToId = ticketDescription.getStationToId();
+        String strDateDep = orderDescription.getDepartureDate();
+        String stationFromId = orderDescription.getStationFromId();
+        String stationToId = orderDescription.getStationToId();
 
         if (!stationFromId.equals(lastFromStationId) || !stationToId.equals(lastTillStationId) || !strDateDep.equals(lastDepDate)) {
             formData.put("from", stationFromId);
@@ -123,62 +122,62 @@ class UZRequests {
 
         try {
             String trainId = trainInfo.getString("num");
-            String date    = trainInfo.getJSONObject("from").getString("srcDate");
+            String date = trainInfo.getJSONObject("from").getString("srcDate");
 
             lastTrainInfo = trainInfo;
 
-            if ((!currentStationFromId.equals(lastFromStationId) || !currentStationTillId.equals(lastTillStationId) ||
-                    !date.equals(lastDepDate) || !trainId.equals(lastTrainId))) {
+//            if ((!currentStationFromId.equals(lastFromStationId) || !currentStationTillId.equals(lastTillStationId) ||
+//                    !date.equals(lastDepDate) || !trainId.equals(lastTrainId))) {
 
 
-                JSONArray car_types = trainInfo.getJSONArray("types");
-                initFormData();
-                formData.put("from", currentStationFromId);
-                formData.put("to", currentStationTillId);
-                formData.put("date", date);
-                formData.put("train", trainId);
-                formData.put("another_ec", "0");
+            JSONArray car_types = trainInfo.getJSONArray("types");
+            initFormData();
+            formData.put("from", trainInfo.getJSONObject("from").getString("code"));
+            formData.put("to", trainInfo.getJSONObject("to").getString("code"));
+            formData.put("date", date);
+            formData.put("train", trainId);
+            formData.put("another_ec", "0");
 
-                for (int i = 0; i < car_types.length(); i++) {
-                    try {
-                        if (formData.containsKey("wagon_type_id"))
-                            formData.remove("wagon_type_id");
-                        String placeId = trainInfo.getJSONArray("types").getJSONObject(i).getString("id");
-                        formData.put("wagon_type_id", placeId);
+            for (int i = 0; i < car_types.length(); i++) {
+                try {
+                    if (formData.containsKey("wagon_type_id"))
+                        formData.remove("wagon_type_id");
+                    String placeId = trainInfo.getJSONArray("types").getJSONObject(i).getString("id");
+                    formData.put("wagon_type_id", placeId);
 
-                        res = new GetUZData().execute(mContext.getString(R.string.base_url) + "/train_wagons/").get();
+                    res = new GetUZData().execute(mContext.getString(R.string.base_url) + "/train_wagons/").get();
 
-                        JSONObject coachesInfo = new JSONObject(res.toString());
+                    JSONObject coachesInfo = new JSONObject(res.toString());
 
-                        coachesInfo.remove("content");
+                    coachesInfo.remove("content");
 
-                        JSONArray availableCars = coachesInfo.getJSONObject("data").getJSONArray("wagons");
-                        for (int j = 0; j < availableCars.length(); j++) {
-                            JSONObject currentCoachInfo = availableCars.getJSONObject(j);
-                            String coachNum = currentCoachInfo.getString("num");
-                            String coachClass = currentCoachInfo.getString("class");
-                            if (formData.containsKey("wagon_num"))
-                                formData.remove("wagon_num");
-                            if (formData.containsKey("wagon_class"))
-                                formData.remove("wagon_class");
-                            formData.put("wagon_num", coachNum);
-                            formData.put("wagon_class", coachClass);
-                            formData.put("wagon_type", placeId.replaceAll("[0-9]", ""));
-                            res = new GetUZData().execute(mContext.getString(R.string.base_url) + "/train_wagon/").get();
-                            tmp.add(res.toString());
-                            JSONObject coachInfo = new JSONObject(res.toString());
-                            JSONObject placesList = coachInfo.getJSONObject("data");
-                            availableCars.getJSONObject(j).put("places_list", placesList);
-                        }
-
-                        placesInfo.add(coachesInfo);
-                    } catch (JSONException e) {
-                        e.printStackTrace();
+                    JSONArray availableCars = coachesInfo.getJSONObject("data").getJSONArray("wagons");
+                    for (int j = 0; j < availableCars.length(); j++) {
+                        JSONObject currentCoachInfo = availableCars.getJSONObject(j);
+                        String coachNum = currentCoachInfo.getString("num");
+                        String coachClass = currentCoachInfo.getString("class");
+                        if (formData.containsKey("wagon_num"))
+                            formData.remove("wagon_num");
+                        if (formData.containsKey("wagon_class"))
+                            formData.remove("wagon_class");
+                        formData.put("wagon_num", coachNum);
+                        formData.put("wagon_class", coachClass);
+                        formData.put("wagon_type", placeId.replaceAll("[0-9]", ""));
+                        res = new GetUZData().execute(mContext.getString(R.string.base_url) + "/train_wagon/").get();
+                        tmp.add(res.toString());
+                        JSONObject coachInfo = new JSONObject(res.toString());
+                        JSONObject placesList = coachInfo.getJSONObject("data");
+                        availableCars.getJSONObject(j).put("places_list", placesList);
                     }
-                }
-                lastPlacesInfo = placesInfo;
 
+                    placesInfo.add(coachesInfo);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
             }
+            lastPlacesInfo = placesInfo;
+
+            // }
         } catch (InterruptedException | ExecutionException | JSONException e) {
             e.printStackTrace();
         }
@@ -189,25 +188,16 @@ class UZRequests {
         String result = null;
         try {
             initFormData();
-            String trainId       = lastTrainInfo.getString("num");
-            String stationFromId = lastFromStationId;
-            String stationTillId = lastTillStationId;
-            formData.put("from", stationFromId);
-            formData.put("to",   stationTillId);
-            formData.put("date", new SimpleDateFormat("yyyy-MM-dd").format(dateDep));
-            formData.put("train", trainId);
-            formData.put("round_trip", "0");
-
             ticketsDescriptions = ticketDescriptions;
             isBuying = true;
             Object res = new GetUZData().execute(mContext.getString(R.string.base_url) + "/cart/add/").get();
             isBuying = false;
             result = res.toString();
-           // result = StringEscapeUtils.unescapeJava(res.toString());
-        } catch (InterruptedException | ExecutionException | JSONException e) {
+            // result = StringEscapeUtils.unescapeJava(res.toString());
+        } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
         }
-        return "result";
+        return result;
     }
 
     String revokeTickets() {
@@ -217,7 +207,7 @@ class UZRequests {
             formData.put("reserve_ids", reservationId);
             Object res = new GetUZData().execute(mContext.getString(R.string.base_url) + "cart/revocation/").get();
             result = res.toString();
-           // result = StringEscapeUtils.unescapeJava(res.toString());
+            // result = StringEscapeUtils.unescapeJava(res.toString());
         } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
         }
@@ -307,7 +297,7 @@ class UZRequests {
             try {
                 URL uzURL = new URL(url_adr);
                 byte[] postData;
-                String formDataStr = "";
+                StringBuilder formDataStr = new StringBuilder();
                 InputStream inputStream;
 
                 HttpURLConnection uzConnection = (HttpURLConnection) uzURL.openConnection();
@@ -318,7 +308,6 @@ class UZRequests {
                 uzConnection.setRequestProperty("charset", "utf-8");
 
 
-
                 for (Map.Entry<String, String> entry : headers.entrySet()) {
                     String key = entry.getKey();
                     String value = entry.getValue();
@@ -327,24 +316,21 @@ class UZRequests {
 
                 if (isBuying) {
 
-                    for (String field : formFields) {
-                        if (formData.containsKey(field)) {
-                            String value = formData.get(field);
-                            if (formDataStr.length() > 0) {
-                                formDataStr += "&";
-                            }
-                            formDataStr += MessageFormat.format("{0}={1}", field, URLEncoder.encode(value));
-                        }
-                    }
-
                     for (int i = 0; i < ticketsDescriptions.size(); i++) {
                         HashMap<String, String> currentTicketDescription = ticketsDescriptions.get(i);
                         for (String field : ticketFields) {
                             if (currentTicketDescription.containsKey(field)) {
                                 if (formDataStr.length() > 0) {
-                                    formDataStr += "&";
+                                    formDataStr.append("&");
                                 }
-                                formDataStr += MessageFormat.format("places[{0}][{1}]={2}", i, field, URLEncoder.encode(currentTicketDescription.get(field)));
+                                formDataStr.append(URLEncoder.encode(MessageFormat.format("places[{0}][{1}]", i, field))).append("=");
+                                if (!currentTicketDescription.get(field).equals("")){
+                                    try {
+                                        formDataStr.append(Integer.parseInt(currentTicketDescription.get(field)));
+                                    } catch (NumberFormatException e){
+                                        formDataStr.append(URLEncoder.encode(MessageFormat.format("{0}", currentTicketDescription.get(field))));
+                                    }
+                                }
                             }
                         }
                     }
@@ -355,19 +341,19 @@ class UZRequests {
                         String key = entry.getKey();
                         String value = entry.getValue();
                         if (formDataStr.length() > 0) {
-                            formDataStr += "&";
+                            formDataStr.append("&");
                         }
-                        formDataStr += MessageFormat.format("{0}={1}", key, URLEncoder.encode(value));
+                        formDataStr.append(MessageFormat.format("{0}={1}", key, URLEncoder.encode(value)));
                     }
                 }
-                postData = formDataStr.getBytes("UTF-8");
+                postData = formDataStr.toString().getBytes("UTF-8");
 
-                uzConnection.setUseCaches( false );
+                uzConnection.setUseCaches(false);
                 try {
-                    DataOutputStream wr = new DataOutputStream( uzConnection.getOutputStream());
-                    wr.write( postData );
+                    DataOutputStream wr = new DataOutputStream(uzConnection.getOutputStream());
+                    wr.write(postData);
                     wr.flush();
-                } catch (IOException e){
+                } catch (IOException e) {
                     e.printStackTrace();
                 }
 
@@ -394,12 +380,13 @@ class UZRequests {
                     cookies = uzConnection.getHeaderFields().get("Set-Cookie");
                 if (isBuying)
                     try {
-                        reservationId =  uzConnection.getHeaderFields().get("Uz-Txn").get(0);
+                        reservationId = uzConnection.getHeaderFields().get("Uz-Txn").get(0);
                     } catch (IndexOutOfBoundsException e) {
                         e.printStackTrace();
                     }
-            } catch (IOException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
+                response_string = "";
             }
             LogSystem.i("UKRZaliznitsya", MessageFormat.format("Response: {0}", response_string));
             return response_string;

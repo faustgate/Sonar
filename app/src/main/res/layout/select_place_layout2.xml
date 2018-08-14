@@ -34,6 +34,6 @@
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/pay"
-        android:id="@+id/pay_button"/>
+        android:text="@string/add_to_cart"
+        android:id="@+id/add_to_cart_button"/>
 </LinearLayout>

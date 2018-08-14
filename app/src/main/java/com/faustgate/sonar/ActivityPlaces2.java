@@ -6,6 +6,8 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.*;
+
+import org.apache.commons.lang3.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -28,35 +30,27 @@ public class ActivityPlaces2 extends Activity {
     private Drawable selected;
     private Drawable busy;
     private JSONObject currentCarDescription;
+    OrderDescription currentTicket = OrderDescription.getInstance();
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Intent intent = getIntent();
         boolean isExtended = false;
-        String carData    = intent.getStringExtra("dat");
-        String name       = intent.getStringExtra("name");
-        String surname    = intent.getStringExtra("surname");
-        String trainNum   = intent.getStringExtra("train_num");
-        String from   = intent.getStringExtra("from");
-        String to   = intent.getStringExtra("to");
-        String dateDep   = intent.getStringExtra("date");
-        String dateFrom   = intent.getStringExtra("from_date");
-        String dateTo   = intent.getStringExtra("to_date");
         setContentView(R.layout.select_place_layout2);
         // base_layout = (ImageView) findViewById(R.id.base_layout);
 
         scheme_map.put("К36", new String[]{"images/coupe_36.png", "schemes/coupe_36.json", "2044", "293", "34", "34"});
         scheme_map.put("К40", new String[]{"images/coupe_40.png", "schemes/coupe_40.json", "2044", "273", "32", "32"});
-        scheme_map.put("П",   new String[]{"images/plazcart.png", "schemes/plazcart.json", "2044", "293", "32", "32"});
-        scheme_map.put("Л",   new String[]{"images/lux.png",      "schemes/lux.json",      "2044", "293", "83", "31"});
-        scheme_map.put("С1",  new String[]{"images/ic_class_1.png", "schemes/ic_class_1.json", "2292", "335", "82", "82"});
-        scheme_map.put("С2",  new String[]{"images/ic_class_2.png", "schemes/ic_class_2.json", "2292", "335", "35", "40"});
+        scheme_map.put("П", new String[]{"images/plazcart.png", "schemes/plazcart.json", "2044", "293", "32", "32"});
+        scheme_map.put("Л", new String[]{"images/lux.png", "schemes/lux.json", "2044", "293", "83", "31"});
+        scheme_map.put("С1", new String[]{"images/ic_class_1.png", "schemes/ic_class_1.json", "2292", "335", "82", "82"});
+        scheme_map.put("С2", new String[]{"images/ic_class_2.png", "schemes/ic_class_2.json", "2292", "335", "35", "40"});
 
         Map<String, String>[] place_map;
 
         AdapterPlaceList placeListAdapter = new AdapterPlaceList(getApplicationContext(), placesDescription);
         ListView lv = (ListView) findViewById(R.id.place_list);
+        Button addToCartButton = (Button) findViewById(R.id.add_to_cart_button);
 
         lv.setAdapter(placeListAdapter);
 
@@ -64,29 +58,31 @@ public class ActivityPlaces2 extends Activity {
         String places_scheme;
 
         try {
+            currentCarDescription = currentTicket.getWagonData();
+//            String trainNum = currentTicket.getTrainData().getString("num");
+//            String dateFrom = currentTicket.getTrainData().getJSONObject("from").getString("sortTime");
+//            String dateTo = currentTicket.getTrainData().getJSONObject("to").getString("sortTime");
 
-            currentCarDescription = new JSONObject(carData);
 
-         //   String key = "Л";
+            //   String key = "Л";
             String key = currentCarDescription.getString("carClassLetter");
 
 
-            if (key.contains("С")){
+            if (key.contains("С")) {
                 available = Drawable.createFromStream(getAssets().open("images/available_ic.png"), null);
                 busy = Drawable.createFromStream(getAssets().open("images/busy_ic.png"), null);
-                selected  = Drawable.createFromStream(getAssets().open("images/selected_ic.png"), null);
-            }
-            else {
+                selected = Drawable.createFromStream(getAssets().open("images/selected_ic.png"), null);
+            } else {
                 available = Drawable.createFromStream(getAssets().open("images/available.png"), null);
                 busy = Drawable.createFromStream(getAssets().open("images/busy.png"), null);
-                selected  = Drawable.createFromStream(getAssets().open("images/selected.png"), null);
+                selected = Drawable.createFromStream(getAssets().open("images/selected.png"), null);
             }
 
 
             JSONObject freePlacesList = new JSONObject(currentCarDescription.getString("places_list")).getJSONObject("places");
 
-            JSONArray  places      = new JSONArray();
-            Iterator   places_iter = freePlacesList.keys();
+            JSONArray places = new JSONArray();
+            Iterator places_iter = freePlacesList.keys();
 
             while (places_iter.hasNext()) {
                 places = freePlacesList.getJSONArray((String) places_iter.next());
@@ -151,55 +147,22 @@ public class ActivityPlaces2 extends Activity {
                     cur_view.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            int placeId = v.getId();
-                            HashMap<String, String> currentTicketDescription = new HashMap<>();
-
+                            Integer placeId = v.getId();
 
                             if (!Boolean.valueOf(place_map[placeId - 1].get("occupied"))) {
                                 boolean isSelected = Boolean.valueOf(place_map[placeId - 1].get("selected"));
-                                ImageView img = (ImageView) findViewById(v.getId());
+                                ImageView img = findViewById(v.getId());
 
                                 isSelected = !isSelected;
 
                                 if (isSelected) {
+                                    currentTicket.setPlaceId(placeId.toString());
                                     img.setImageDrawable(selected);
-
-
-                                    try {
-                                        currentTicketDescription.put("price", currentCarDescription.getString("price"));
-                                        currentTicketDescription.put("wagon_num", currentCarDescription.getString("number"));
-                                        currentTicketDescription.put("charline", currentCarDescription.getString("coach_class"));
-                                        currentTicketDescription.put("wagon_class", currentCarDescription.getString("coach_class"));
-                                        String wagonType = currentCarDescription.getString("carClassLetter");
-                                        if (wagonType.contains("С"))
-                                            wagonType = wagonType.replaceAll("[0-9]", "");
-                                        currentTicketDescription.put("wagon_type", wagonType);
-                                        currentTicketDescription.put("place_num", String.valueOf(placeId));
-
-
-                                    } catch (JSONException e) {
-                                        e.printStackTrace();
-                                    }
-                                    currentTicketDescription.put("from", from);
-                                    currentTicketDescription.put("to",   to);
-                                    currentTicketDescription.put("date", dateDep);
-                                    currentTicketDescription.put("from_date", dateFrom);
-                                    currentTicketDescription.put("to_date", dateTo);
-                                    currentTicketDescription.put("train", trainNum);
-                                    currentTicketDescription.put("firstname", name);
-                                    currentTicketDescription.put("lastname", surname);
-                                    currentTicketDescription.put("ord", "0");
-
-                                    currentTicketDescription.put("bedding", "1");
-                                    currentTicketDescription.put("child", "");
-                                    currentTicketDescription.put("stud", "");
-                                    currentTicketDescription.put("transportation", "0");
-                                    currentTicketDescription.put("reserve", "0");
-                                    placesDescription.add(currentTicketDescription);
+                                    placesDescription.add(currentTicket.getTicketDescription());
 
                                 } else {
                                     for (int i = 0; i < placesDescription.size(); i++) {
-                                        if (placesDescription.get(i).get("place_num").equals(String.valueOf(placeId))) {
+                                        if (placesDescription.get(i).get("place_num").equals(StringUtils.leftPad(String.valueOf(placeId), 3, '0'))) {
                                             placesDescription.remove(i);
                                         }
                                     }
@@ -208,6 +171,7 @@ public class ActivityPlaces2 extends Activity {
                                 place_map[placeId - 1].put("selected", String.valueOf(isSelected));
                             }
                             placeListAdapter.notifyDataSetChanged();
+                            addToCartButton.setEnabled(placesDescription.size() > 0);
                         }
                     });
                 } else {
@@ -228,14 +192,12 @@ public class ActivityPlaces2 extends Activity {
                 al.addView(cur_view);
             }
 
-            Button pay_button = (Button) findViewById(R.id.pay_button);
-            pay_button.setOnClickListener(new View.OnClickListener() {
+
+            addToCartButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-
-                    String ticketsData = UZRequests.getInstance().buyTickets(placesDescription);
-                    placesDescription.clear();
-                    Intent intent = new Intent(ActivityPlaces2.this, ActivityBuyTickets.class);
+                    ApplicationSonar.getInstance().ticketStorage.addAll(placesDescription);
+                    Intent intent = new Intent(ActivityPlaces2.this, ActivityStart.class);
                     startActivity(intent);
                 }
             });

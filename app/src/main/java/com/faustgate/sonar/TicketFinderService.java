@@ -100,7 +100,7 @@ public class TicketFinderService extends Service {
     private class MyTimerTask extends TimerTask {
         @Override
         public void run() {
-            String trainData = UZRequests.getInstance().searchForTrains(TicketDescription.getInstance());
+            String trainData = UZRequests.getInstance().searchForTrains(OrderDescription.getInstance());
             try {
                 JSONObject resp = new JSONObject(trainData);
                 if (resp.getString("error").equals("true") || (!resp.has("value"))) {

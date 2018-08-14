@@ -10,14 +10,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-/**
- * Created by werwolf on 8/24/16.
- */
-
 class AdapterStationAutoComplete extends BaseAdapter implements Filterable {
-
-    private static final int MAX_RESULTS = 10;
-
     private final Context mContext;
     private List<String> mResults;
     private ArrayList<String> names = new ArrayList<>();
@@ -90,17 +83,13 @@ class AdapterStationAutoComplete extends BaseAdapter implements Filterable {
         };
     }
 
-    /**
-     * Returns a search result for the given book title.
-     */
     private List<HashMap<String, String>> findStations(String stationName) {
         List<HashMap<String, String>> stations;
         names.clear();
         try {
             stations = UZRequests.getInstance().getStationsInfo(stationName);
             if (stations.size() == 0) {
-                Toast da = Toast.makeText(mContext, mContext.getString(R.string.no_stations_found), Toast.LENGTH_SHORT);
-                da.show();
+                Toast.makeText(mContext, mContext.getString(R.string.no_stations_found), Toast.LENGTH_LONG).show();
             }
             return stations;
         } catch (Exception e) {

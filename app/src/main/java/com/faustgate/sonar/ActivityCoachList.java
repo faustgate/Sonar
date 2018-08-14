@@ -22,16 +22,12 @@ public class ActivityCoachList extends Activity {
     private ArrayAdapter<String> adapter;
     private ArrayList<HashMap<String, String>> placesDescription = new ArrayList<>();
     private HashMap<String, String> currentTicketDescription = new HashMap<>();
+    private OrderDescription currentTicket = OrderDescription.getInstance();
 
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        Intent intent = getIntent();
-        String trainData = intent.getStringExtra("train");
-        String name = intent.getStringExtra("name");
-        String surname = intent.getStringExtra("surname");
 
         List<String> placeLetters = new ArrayList<>();
         List<String> placeTypes = new ArrayList<>();
@@ -39,11 +35,11 @@ public class ActivityCoachList extends Activity {
         placeTypes.add("All");
 
         setContentView(R.layout.select_coach_layout);
-        Spinner coachTypeFilterSpinner = (Spinner) findViewById(R.id.spinnerPlaceTypeFilter);
+        Spinner coachTypeFilterSpinner = findViewById(R.id.spinnerPlaceTypeFilter);
         JSONObject curTrain;
 
         try {
-            curTrain = new JSONObject(trainData);
+            curTrain = currentTicket.getTrainData();
             List<JSONObject> ticketsData = UZRequests.getInstance().searchForTickets(curTrain);
 
             car_types = curTrain.getJSONArray("types");
@@ -63,11 +59,13 @@ public class ActivityCoachList extends Activity {
                     currentCarDescription.put("coach_class", places.getJSONObject(i).getString("class"));
                     currentCarDescription.put("places_list", places.getJSONObject(i).getString("places_list"));
                     currentCarDescription.put("places_count", places.getJSONObject(i).getString("free"));
+                    currentCarDescription.put("railway", places.getJSONObject(i).getString("railway"));
 
                     Iterator prices = places.getJSONObject(i).getJSONObject("prices").keys();
                     while (prices.hasNext()) {
                         String key = (String) prices.next();
                         currentCarDescription.put("price", places.getJSONObject(i).getJSONObject("prices").getString(key));
+                        currentCarDescription.put("charline", key);
                     }
                     String carClassLetter = places.getJSONObject(i).getString("type_id");
                     String carClassName = places.getJSONObject(i).getString("type");
@@ -116,24 +114,8 @@ public class ActivityCoachList extends Activity {
             lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
                     Intent intent = new Intent(ActivityCoachList.this, ActivityPlaces2.class);
-
-                    intent.putExtra("dat", new JSONObject(carDescriptions.get(position)).toString());
-                    try {
-                        intent.putExtra("train_num", curTrain.getString("num"));
-                        intent.putExtra("from", curTrain.getJSONObject("from").getString("code"));
-                        intent.putExtra("to", curTrain.getJSONObject("to").getString("code"));
-                        intent.putExtra("date", curTrain.getJSONObject("from").getString("srcDate"));
-                        intent.putExtra("from_date", curTrain.getJSONObject("from").getString("sortTime"));
-                        intent.putExtra("to_date",   curTrain.getJSONObject("to").getString("sortTime"));
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                    intent.putExtra("name", name);
-                    intent.putExtra("surname", surname);
-                    //intent.putExtra("ticketsData", ticketsData.toString());
-
+                    currentTicket.setWagonData(new JSONObject(carDescriptions.get(position)));
                     startActivity(intent);
                 }
             });

@@ -39,10 +39,11 @@ class SoundNotifier {
 
     void stopSound() {
         vibrator.cancel();
-        if (mp.isPlaying()) {
-            mp.stop();
-            mp.release();
+        if (mp != null) {
+            if (mp.isPlaying()) {
+                mp.stop();
+                mp.release();
+            }
         }
     }
-
 }
