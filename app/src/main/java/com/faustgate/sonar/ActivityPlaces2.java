@@ -20,12 +20,8 @@ import java.util.*;
 
 
 public class ActivityPlaces2 extends Activity {
-    private JSONArray car_types;
-    private ArrayAdapter<String> adapter;
     private ArrayList<HashMap<String, String>> placesDescription = new ArrayList<>();
     private Map<String, String[]> scheme_map = new HashMap<>();
-    ImageView base_layout;
-    private Drawable scheme;
     private Drawable available;
     private Drawable selected;
     private Drawable busy;
@@ -43,7 +39,7 @@ public class ActivityPlaces2 extends Activity {
         scheme_map.put("К40", new String[]{"images/coupe_40.png", "schemes/coupe_40.json", "2044", "273", "32", "32"});
         scheme_map.put("П", new String[]{"images/plazcart.png", "schemes/plazcart.json", "2044", "293", "32", "32"});
         scheme_map.put("Л", new String[]{"images/lux.png", "schemes/lux.json", "2044", "293", "83", "31"});
-        scheme_map.put("С1", new String[]{"images/ic_class_1.png", "schemes/ic_class_1.json", "2292", "335", "82", "82"});
+        scheme_map.put("С1", new String[]{"images/ic_class_1.png", "schemes/ic_class_1.json", "2292", "335", "35", "40"});
         scheme_map.put("С2", new String[]{"images/ic_class_2.png", "schemes/ic_class_2.json", "2292", "335", "35", "40"});
 
         Map<String, String>[] place_map;

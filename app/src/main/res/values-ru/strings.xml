@@ -75,4 +75,9 @@
     <string name="wagon">Вагон</string>
     <string name="show_trains_wo_places">Показать поезда без свободных мест</string>
     <string name="add_to_cart">Добавить в корзину</string>
+    <string name="no_places_train_body">No available places in selected train at selected date, please select action:</string>
+    <string name="no_places_train_enable_monitor">Turn on monitor and wait \n for available tickets</string>
+    <string name="no_places_train_find_nearest">Find nearest date with \n available places</string>
+    <string name="no_places_train_head">No places in selected train</string>
+    <string name="title_activity_start">ActivityStart</string>
 </resources>

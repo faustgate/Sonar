@@ -20,7 +20,6 @@ import java.util.*;
 public class ActivityMain extends Activity {
     private Calendar date = Calendar.getInstance();
     Spinner buySpinner, ticketTypeSpinner, placesAmountSpinner, carTypeSpinner, trainTypesSpinner;
-    private String stationFromId = "";
     private String stationFromName = "";
     private String stationToId = "";
     private String stationToName = "";
@@ -363,7 +362,6 @@ public class ActivityMain extends Activity {
     private void initStationFrom(HashMap<String, String> station) {
         stationFromName = station.get("title");
         currentTicket.setStationFromId(station.get("station_id"));
-        stationFromId = station.get("station_id");
         stationFromEdit.setText(stationFromName);
         stationFromEdit.setSelection(stationFromEdit.getText().length());
         isDepStationCorrect = true;

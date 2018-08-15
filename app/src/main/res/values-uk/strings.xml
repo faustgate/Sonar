@@ -13,7 +13,7 @@
     <string name="err_fill_surname_head">Пусте прізвище</string>
     <string name="err_same_stations_body">Станції відправлення та прибуття співпадають</string>
     <string name="err_same_stations_head">Станції відправлення та прибуття співпадають</string>
-    <string name="err_wrong_arr_station_body">Станцію прибуття не введено або введено помилково</string>
+    <string name="err_wrong_arr_station_body">Станцію прибуття не введено, або введено помилково</string>
     <string name="err_wrong_arr_station_head">Помилкова станція прибуття</string>
     <string name="err_wrong_dep_station_body">Станцію відправлення не введено або введено помилково</string>
     <string name="err_wrong_dep_station_head">Помилкова станція відправлення</string>
@@ -75,4 +75,9 @@
     <string name="place">Місце</string>
     <string name="show_trains_wo_places">Показати поїзди без свободних місць</string>
     <string name="add_to_cart">Оплатити</string>
+    <string name="no_places_train_body">No available places in selected train at selected date, please select action:</string>
+    <string name="no_places_train_enable_monitor">Turn on monitor and wait \n for available tickets</string>
+    <string name="no_places_train_find_nearest">Find nearest date with \n available places</string>
+    <string name="no_places_train_head">No places in selected train</string>
+    <string name="title_activity_start">ActivityStart</string>
 </resources>

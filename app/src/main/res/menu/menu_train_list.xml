@@ -1,10 +1,11 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context=".ActivityMain">
     <item
         android:id="@+id/switchId"
         android:title=""
-        android:showAsAction="always"
-        android:actionLayout="@layout/switch_layout"/>
+        android:actionLayout="@layout/switch_layout"
+        app:showAsAction="always" />
 
 </menu>
