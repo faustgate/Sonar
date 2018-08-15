@@ -6,8 +6,8 @@ android {
         applicationId "com.faustgate.sonar"
         minSdkVersion 14
         targetSdkVersion 27
-        versionCode 1
-        versionName "1.0"
+        versionCode 10100
+        versionName "1.01.00"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
